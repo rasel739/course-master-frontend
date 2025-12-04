@@ -11,16 +11,16 @@ export interface User {
   updatedAt: string;
 }
 
-export interface LoginRequest {
+export interface ILogin {
   email: string;
   password: string;
 }
 
-export interface RegisterRequest {
+export interface IRegister {
   name: string;
   email: string;
   password: string;
-  registrationKey?: string;
+  confirmPassword: string;
 }
 
 export interface AuthResponse {
