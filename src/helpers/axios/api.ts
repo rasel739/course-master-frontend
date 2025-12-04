@@ -1,7 +1,7 @@
 import axiosInstance from './interceptors';
 import {
-  LoginRequest,
-  RegisterRequest,
+  ILogin,
+  IRegister,
   AuthResponse,
   User,
   CourseQuery,
@@ -20,12 +20,11 @@ import {
   ApiResponse,
 } from '@/types';
 
-// Auth Endpoints
 export const authApi = {
-  register: (data: RegisterRequest) =>
+  register: (data: IRegister) =>
     axiosInstance.post<ApiResponse<AuthResponse>>('/auth/register', data),
 
-  login: (data: LoginRequest) => axiosInstance.post<ApiResponse<AuthResponse>>('/auth/login', data),
+  login: (data: ILogin) => axiosInstance.post<ApiResponse<AuthResponse>>('/auth/login', data),
 
   logout: () => axiosInstance.post<ApiResponse>('/auth/logout'),
 

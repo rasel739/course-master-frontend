@@ -16,5 +16,12 @@ export const registerSchema = yup.object({
     .string()
     .oneOf([yup.ref('password')], 'Passwords must match')
     .required('Please confirm your password'),
-  // registrationKey: yup.string().optional().notRequired(),
+});
+
+export const loginSchema = yup.object({
+  email: yup.string().email('Invalid email address').required('Email is required'),
+  password: yup
+    .string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required'),
 });

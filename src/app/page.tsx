@@ -6,13 +6,13 @@ import Footer from '@/components/layout/footer';
 
 export default function Home() {
   return (
-    <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50'>
+    <div className='min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50'>
       <Header />
 
       {/* Hero Section */}
       <section className='container mx-auto px-4 py-20 md:py-32'>
         <div className='max-w-4xl mx-auto text-center'>
-          <h1 className='text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+          <h1 className='text-5xl md:text-6xl font-bold mb-6 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
             Learn Anything, Anywhere
           </h1>
           <p className='text-xl text-gray-600 mb-8 max-w-2xl mx-auto'>
@@ -69,7 +69,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className='bg-gradient-to-r from-blue-600 to-purple-600 py-16'>
+      <section className='bg-linear-to-r from-blue-600 to-purple-600 py-16'>
         <div className='container mx-auto px-4'>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white'>
             <div>
@@ -106,7 +106,7 @@ export default function Home() {
               'Join a supportive community of learners',
             ].map((feature, index) => (
               <div key={index} className='flex items-start space-x-3'>
-                <CheckCircle className='w-6 h-6 text-green-600 flex-shrink-0 mt-0.5' />
+                <CheckCircle className='w-6 h-6 text-green-600 shrink-0 mt-0.5' />
                 <p className='text-lg text-gray-700'>{feature}</p>
               </div>
             ))}
@@ -115,7 +115,7 @@ export default function Home() {
       </section>
 
       <section className='container mx-auto px-4 py-16'>
-        <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center text-white'>
+        <div className='bg-linear-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center text-white'>
           <h2 className='text-3xl md:text-4xl font-bold mb-4'>Ready to Start Learning?</h2>
           <p className='text-xl text-blue-100 mb-8 max-w-2xl mx-auto'>
             Join thousands of students already learning on Course Master

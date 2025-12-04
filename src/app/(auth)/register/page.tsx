@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { clearError, registerUser } from '@/redux/features/authSlice';
 import { registerSchema } from '@/schema';
 
-export default function RegisterPage() {
+const Register = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { isLoading, isAuthenticated, error } = useAppSelector((state) => state.auth);
@@ -132,4 +132,6 @@ export default function RegisterPage() {
       </Card>
     </div>
   );
-}
+};
+
+export default Register;
