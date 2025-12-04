@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,16 +13,9 @@ import { GraduationCap, Loader2 } from 'lucide-react';
 import { ILogin } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { clearError, loginUser } from '@/redux/features/authSlice';
+import { loginSchema } from '@/schema';
 
-const schema = yup.object({
-  email: yup.string().email('Invalid email address').required('Email is required'),
-  password: yup
-    .string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
-});
-
-export default function LoginPage() {
+const Login = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
@@ -34,7 +26,7 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<ILogin>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(loginSchema),
   });
 
   useEffect(() => {
@@ -120,4 +112,6 @@ export default function LoginPage() {
       </Card>
     </div>
   );
-}
+};
+
+export default Login;
