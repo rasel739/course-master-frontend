@@ -5,7 +5,7 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
   const { pathname } = request.nextUrl;
 
-  const publicRoutes = ['/', '/login', '/register'];
+  const publicRoutes = ['/', '/login', '/register', '/courses'];
 
   if (!token && !publicRoutes.includes(pathname)) {
     const loginUrl = new URL('/login', request.url);
@@ -13,7 +13,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (token && publicRoutes.includes(pathname)) {
+  const authRoutes = ['/login', '/register'];
+
+  if (token && authRoutes.includes(pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

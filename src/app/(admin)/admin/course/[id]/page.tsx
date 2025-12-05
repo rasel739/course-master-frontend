@@ -120,7 +120,7 @@ const AdminCourseDetails = () => {
             <p className='text-gray-600 mt-2'>Manage course content</p>
           </div>
         </div>
-        <Button variant='outline' onClick={() => router.push(`/admin/course/${course._id}/edit`)}>
+        <Button variant='outline' onClick={() => router.push(`/admin/course/edit/${course._id}`)}>
           <Edit className='w-4 h-4 mr-2' />
           Edit Course
         </Button>

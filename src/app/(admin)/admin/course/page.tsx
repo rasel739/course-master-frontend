@@ -14,26 +14,26 @@ import { formatPrice, formatDate } from '@/utils';
 const AdminCourse = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { courses, isLoading } = useAppSelector((state) => state.course);
+  const { courses, isLoading, filters } = useAppSelector((state) => state.course);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
-    dispatch(fetchCourses());
-  }, [dispatch]);
+    dispatch(fetchCourses(filters));
+  }, [dispatch, filters]);
 
   const handleDelete = async (id: string) => {
     if (deleteConfirm === id) {
       await dispatch(deleteCourse(id));
       setDeleteConfirm(null);
-      dispatch(fetchCourses());
+      dispatch(fetchCourses(filters));
     } else {
       setDeleteConfirm(id);
       setTimeout(() => setDeleteConfirm(null), 3000);
     }
   };
 
-  const filteredCourses = courses.filter(
+  const filteredCourses = courses?.filter(
     (course) =>
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,13 +56,12 @@ const AdminCourse = () => {
           <h1 className='text-3xl font-bold text-gray-900'>Course Management</h1>
           <p className='text-gray-600 mt-2'>Create and manage all courses</p>
         </div>
-        <Button onClick={() => router.push('/admin/course/create')}>
+        <Button className='cursor-pointer' onClick={() => router.push('/admin/course/create')}>
           <Plus className='w-4 h-4 mr-2' />
           Create Course
         </Button>
       </div>
 
-      {/* Search */}
       <div className='relative'>
         <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
         <Input
@@ -79,14 +78,14 @@ const AdminCourse = () => {
         <Card>
           <CardContent className='p-4'>
             <p className='text-sm text-gray-600'>Total Courses</p>
-            <p className='text-2xl font-bold text-gray-900'>{courses.length}</p>
+            <p className='text-2xl font-bold text-gray-900'>{courses?.length}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className='p-4'>
             <p className='text-sm text-gray-600'>Published</p>
             <p className='text-2xl font-bold text-green-600'>
-              {courses.filter((c) => c.isPublished).length}
+              {courses?.filter((c) => c.isPublished).length}
             </p>
           </CardContent>
         </Card>
@@ -94,7 +93,7 @@ const AdminCourse = () => {
           <CardContent className='p-4'>
             <p className='text-sm text-gray-600'>Draft</p>
             <p className='text-2xl font-bold text-orange-600'>
-              {courses.filter((c) => !c.isPublished).length}
+              {courses?.filter((c) => !c.isPublished).length}
             </p>
           </CardContent>
         </Card>
@@ -102,13 +101,12 @@ const AdminCourse = () => {
           <CardContent className='p-4'>
             <p className='text-sm text-gray-600'>Total Enrollments</p>
             <p className='text-2xl font-bold text-blue-600'>
-              {courses.reduce((sum, c) => sum + c.totalEnrollments, 0)}
+              {courses?.reduce((sum, c) => sum + c.totalEnrollments, 0)}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Courses Table */}
       <Card>
         <CardContent className='p-0'>
           <div className='overflow-x-auto'>
@@ -150,23 +148,23 @@ const AdminCourse = () => {
                     <tr key={course._id} className='hover:bg-gray-50'>
                       <td className='px-6 py-4'>
                         <div>
-                          <p className='font-medium text-gray-900 line-clamp-1'>{course.title}</p>
-                          <p className='text-sm text-gray-500'>by {course.instructor}</p>
+                          <p className='font-medium text-gray-900 line-clamp-1'>{course?.title}</p>
+                          <p className='text-sm text-gray-500'>by {course?.instructor}</p>
                         </div>
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap'>
                         <span className='px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800'>
-                          {course.category}
+                          {course?.category}
                         </span>
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                        {formatPrice(course.price)}
+                        {formatPrice(course?.price)}
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
-                        {course.totalEnrollments}
+                        {course?.totalEnrollments}
                       </td>
                       <td className='px-6 py-4 whitespace-nowrap'>
-                        {course.isPublished ? (
+                        {course?.isPublished ? (
                           <span className='px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800'>
                             Published
                           </span>
@@ -184,6 +182,7 @@ const AdminCourse = () => {
                           <Button
                             variant='ghost'
                             size='sm'
+                            className='cursor-pointer'
                             onClick={() => router.push(`/admin/course/${course._id}`)}
                           >
                             <Eye className='w-4 h-4' />
@@ -191,7 +190,8 @@ const AdminCourse = () => {
                           <Button
                             variant='ghost'
                             size='sm'
-                            onClick={() => router.push(`/admin/course/${course._id}/edit`)}
+                            className='cursor-pointer'
+                            onClick={() => router.push(`/admin/course/edit/${course._id}`)}
                           >
                             <Edit className='w-4 h-4' />
                           </Button>
@@ -201,7 +201,7 @@ const AdminCourse = () => {
                             onClick={() => handleDelete(course._id)}
                             className={
                               deleteConfirm === course._id
-                                ? 'text-red-600 hover:text-red-700'
+                                ? 'text-red-600 hover:text-red-700 cursor-pointer'
                                 : 'text-gray-600'
                             }
                           >
