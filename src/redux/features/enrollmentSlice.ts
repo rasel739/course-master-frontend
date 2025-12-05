@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Enrollment, MarkLessonCompleteRequest } from '@/types';
 import toast from 'react-hot-toast';
 import { studentApi } from '@/helpers/axios/api';
+import { getErrorMessage } from '@/utils';
 
 interface EnrollmentState {
   enrollments: Enrollment[];
@@ -25,8 +26,8 @@ export const enrollInCourse = createAsyncThunk(
       const response = await studentApi.enrollCourse(courseId);
       toast.success('Successfully enrolled in course!');
       return response.data.data!;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Enrollment failed';
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
       toast.error(message);
       return rejectWithValue(message);
     }
@@ -39,8 +40,10 @@ export const fetchDashboard = createAsyncThunk(
     try {
       const response = await studentApi.getDashboard();
       return response.data.data!.enrollments;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch dashboard');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );
@@ -51,8 +54,10 @@ export const fetchEnrollmentDetails = createAsyncThunk(
     try {
       const response = await studentApi.getEnrollmentDetails(enrollmentId);
       return response.data.data!;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch enrollment details');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );
@@ -64,8 +69,8 @@ export const markLessonComplete = createAsyncThunk(
       const response = await studentApi.markLessonComplete(data);
       toast.success('Lesson marked as complete!');
       return { ...response.data.data!, enrollmentId: data.enrollmentId };
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to mark lesson complete';
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
       toast.error(message);
       return rejectWithValue(message);
     }

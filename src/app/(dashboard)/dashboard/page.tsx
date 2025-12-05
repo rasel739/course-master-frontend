@@ -18,32 +18,32 @@ const Dashboard = () => {
   const { enrollments, isLoading } = useAppSelector((state) => state.enrollment);
 
   useEffect(() => {
-    dispatch(fetchDashboard());
+    dispatch(fetchDashboard()).unwrap();
   }, [dispatch]);
 
   const stats = [
     {
       title: 'Enrolled Courses',
-      value: enrollments.length,
+      value: enrollments?.length,
       icon: BookOpen,
       color: 'bg-blue-100 text-blue-600',
     },
     {
       title: 'In Progress',
-      value: enrollments.filter((e) => e.progress > 0 && e.progress < 100).length,
+      value: enrollments?.filter((e) => e.progress > 0 && e.progress < 100).length,
       icon: TrendingUp,
       color: 'bg-purple-100 text-purple-600',
     },
     {
       title: 'Completed',
-      value: enrollments.filter((e) => e.progress === 100).length,
+      value: enrollments?.filter((e) => e.progress === 100).length,
       icon: Award,
       color: 'bg-green-100 text-green-600',
     },
     {
       title: 'Total Progress',
       value:
-        enrollments.length > 0
+        enrollments?.length > 0
           ? Math.round(enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length) +
             '%'
           : '0%',
@@ -70,7 +70,7 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        {stats.map((stat, index) => (
+        {stats?.map((stat, index) => (
           <Card key={index}>
             <CardContent className='p-6'>
               <div className='flex items-center justify-between mb-4'>
@@ -88,7 +88,7 @@ const Dashboard = () => {
       </div>
 
       {/* Continue Learning */}
-      {enrollments.length > 0 ? (
+      {enrollments?.length > 0 ? (
         <div>
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-2xl font-bold text-gray-900'>Continue Learning</h2>

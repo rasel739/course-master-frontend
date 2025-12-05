@@ -53,3 +53,26 @@ export function debounce<T extends (...args: any[]) => any>(
     timeout = setTimeout(() => func(...args), wait);
   };
 }
+
+export function getErrorMessage(error: unknown): string {
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof (error as Record<string, unknown>).response === 'object'
+  ) {
+    const response = (error as { response?: { data?: { message?: string; error?: string } } })
+      .response;
+
+    const message = response?.data?.message || response?.data?.error;
+    if (typeof message === 'string') {
+      return message;
+    }
+  }
+
+  if (error instanceof Error && typeof error.message === 'string') {
+    return error.message;
+  }
+
+  return 'Something went wrong';
+}

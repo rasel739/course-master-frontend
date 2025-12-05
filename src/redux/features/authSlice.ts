@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
-import { User, LoginRequest, RegisterRequest } from '@/types';
+import { User, ILogin, IRegister } from '@/types';
 import toast from 'react-hot-toast';
 import { authApi } from '@/helpers/axios/api';
+import { getErrorMessage } from '@/utils';
 
 interface AuthState {
   user: User | null;
@@ -18,10 +19,9 @@ const initialState: AuthState = {
   error: null,
 };
 
-// Async thunks
 export const loginUser = createAsyncThunk(
   'auth/login',
-  async (credentials: LoginRequest, { rejectWithValue }) => {
+  async (credentials: ILogin, { rejectWithValue }) => {
     try {
       const response = await authApi.login(credentials);
       const { accessToken, refreshToken } = response.data.data!;
@@ -35,14 +35,16 @@ export const loginUser = createAsyncThunk(
       toast.success('Login successful!');
       return userResponse.data.data!;
     } catch (error: unknown) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );
 
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async (userData: RegisterRequest, { rejectWithValue }) => {
+  async (userData: IRegister, { rejectWithValue }) => {
     try {
       const response = await authApi.register(userData);
       const { accessToken, refreshToken } = response.data.data!;
@@ -55,8 +57,10 @@ export const registerUser = createAsyncThunk(
       const userResponse = await authApi.getMe();
       toast.success('Registration successful!');
       return userResponse.data.data!;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Registration failed');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );
@@ -67,8 +71,10 @@ export const fetchCurrentUser = createAsyncThunk(
     try {
       const response = await authApi.getMe();
       return response.data.data!;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );
@@ -80,10 +86,12 @@ export const logoutUser = createAsyncThunk('auth/logout', async (_, { rejectWith
     Cookies.remove('refreshToken');
     toast.success('Logged out successfully');
     return null;
-  } catch (error: any) {
+  } catch (error: unknown) {
     Cookies.remove('accessToken');
     Cookies.remove('refreshToken');
-    return rejectWithValue(error.response?.data?.message || 'Logout failed');
+    const message = getErrorMessage(error);
+    toast.error(message);
+    return rejectWithValue(message);
   }
 });
 
@@ -100,7 +108,6 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Login
     builder
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
@@ -117,7 +124,6 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Register
     builder
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
@@ -134,7 +140,6 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Fetch Current User
     builder
       .addCase(fetchCurrentUser.pending, (state) => {
         state.isLoading = true;
@@ -152,7 +157,6 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Logout
     builder
       .addCase(logoutUser.pending, (state) => {
         state.isLoading = true;

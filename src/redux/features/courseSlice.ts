@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 import { Course, CourseQuery, CoursePagination } from '@/types';
 import { courseApi } from '@/helpers/axios/api';
+import { getErrorMessage } from '@/utils';
+import toast from 'react-hot-toast';
 
 interface CourseState {
   courses: Course[];
@@ -29,12 +31,14 @@ const initialState: CourseState = {
 // Async thunks
 export const fetchCourses = createAsyncThunk(
   'course/fetchCourses',
-  async (query: CourseQuery | undefined, { rejectWithValue }) => {
+  async (query?: CourseQuery | undefined, { rejectWithValue }) => {
     try {
       const response = await courseApi.getCourses(query);
       return response.data.data!;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch courses');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );
@@ -45,8 +49,10 @@ export const fetchCourseById = createAsyncThunk(
     try {
       const response = await courseApi.getCourseById(id);
       return response.data.data!;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch course');
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      toast.error(message);
+      return rejectWithValue(message);
     }
   }
 );

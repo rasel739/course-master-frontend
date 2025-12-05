@@ -211,7 +211,7 @@ export interface CoursesByCategory {
   totalEnrollments: number;
 }
 
-export interface AnalyticsData {
+export interface IAnalyticsData {
   overview: {
     totalCourses: number;
     totalEnrollments: number;
@@ -219,6 +219,11 @@ export interface AnalyticsData {
   };
   enrollmentTrends: EnrollmentTrend[];
   coursesByCategory: CoursesByCategory[];
+}
+
+export interface IAnalyticsParams {
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ApiResponse<T = unknown> {
