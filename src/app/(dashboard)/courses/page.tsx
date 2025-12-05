@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCourses, setFilters } from '@/redux/features/courseSlice';
 import { debounce, formatDuration, formatPrice } from '@/utils';
 import { categories } from '@/constants';
+import Image from 'next/image';
 
 const Course = () => {
   const router = useRouter();
@@ -38,7 +39,7 @@ const Course = () => {
   const handleCategoryChange = (category: string) => {
     dispatch(
       setFilters({
-        category: filters.category === category ? undefined : category,
+        category: filters?.category === category ? undefined : category,
         page: 1,
       })
     );
@@ -51,15 +52,12 @@ const Course = () => {
 
   return (
     <div className='space-y-6'>
-      {/* Header */}
       <div>
         <h1 className='text-3xl font-bold text-gray-900'>Explore Courses</h1>
         <p className='text-gray-600 mt-2'>Discover courses from expert instructors</p>
       </div>
 
-      {/* Search and Filters */}
       <div className='space-y-4'>
-        {/* Search Bar */}
         <div className='relative'>
           <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400' />
           <Input
@@ -74,7 +72,6 @@ const Course = () => {
           />
         </div>
 
-        {/* Category Filters */}
         <div className='flex items-center space-x-2 overflow-x-auto pb-2'>
           <Filter className='w-5 h-5 text-gray-600 shrink-0' />
           <Button
@@ -98,14 +95,12 @@ const Course = () => {
         </div>
       </div>
 
-      {/* Results Count */}
       {pagination && (
         <div className='text-sm text-gray-600'>
           Showing {courses.length} of {pagination.totalCourses} courses
         </div>
       )}
 
-      {/* Loading State */}
       {isLoading ? (
         <div className='flex items-center justify-center h-96'>
           <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
@@ -120,15 +115,15 @@ const Course = () => {
         </Card>
       ) : (
         <>
-          {/* Courses Grid */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {courses.map((course) => (
+            {courses?.map((course) => (
               <Card
                 key={course._id}
                 className='hover:shadow-xl transition-all cursor-pointer group'
                 onClick={() => router.push(`/courses/${course._id}`)}
               >
                 <div className='relative h-48 bg-linear-to-br from-blue-500 to-purple-600 overflow-hidden rounded-t-lg'>
+                  <Image src={`${course?.thumbnail}`} alt='course-image' fill />
                   <div className='absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all' />
                   <div className='absolute bottom-4 left-4 right-4'>
                     <span className='bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-800'>
@@ -175,7 +170,7 @@ const Course = () => {
                     </span>
                   </div>
 
-                  <Button className='w-full mt-4 group'>
+                  <Button className='w-full mt-4 group cursor-pointer'>
                     View Details
                     <ChevronRight className='w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform' />
                   </Button>
