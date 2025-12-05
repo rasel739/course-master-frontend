@@ -81,3 +81,26 @@ export const createCourseSchema = yup.object({
   thumbnail: yup.string().url('Must be a valid URL').optional(),
   tags: yup.string().optional(),
 });
+
+export const editCourseSchema = yup.object({
+  title: yup
+    .string()
+    .min(3, 'Title must be at least 3 characters')
+    .max(100, 'Title cannot exceed 100 characters')
+    .required('Title is required'),
+  description: yup
+    .string()
+    .min(10, 'Description must be at least 10 characters')
+    .max(2000, 'Description cannot exceed 2000 characters')
+    .required('Description is required'),
+  instructor: yup
+    .string()
+    .min(2, 'Instructor name must be at least 2 characters')
+    .max(100, 'Instructor name cannot exceed 100 characters')
+    .required('Instructor is required'),
+  category: yup.string().oneOf(categories, 'Invalid category').required('Category is required'),
+  price: yup.number().min(0, 'Price cannot be negative').required('Price is required'),
+  thumbnail: yup.string().url('Must be a valid URL').optional(),
+  tags: yup.string().optional(),
+  isPublished: yup.boolean().required(),
+});
