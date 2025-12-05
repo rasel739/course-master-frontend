@@ -90,13 +90,13 @@ const EnrollmentDetails = () => {
             <div className='w-full bg-gray-200 rounded-full h-3'>
               <div
                 className='bg-blue-600 h-3 rounded-full transition-all'
-                style={{ width: `${enrollment.progress}%` }}
+                style={{ width: `${enrollment?.progress}%` }}
               />
             </div>
             <div className='flex justify-between mt-2 text-sm text-gray-600'>
-              <span>{enrollment.completedLessons.length} lessons completed</span>
+              <span>{enrollment?.completedLessons.length} lessons completed</span>
               <span>
-                {course.modules.reduce((sum, m) => sum + m.lessons.length, 0)} total lessons
+                {course?.modules.reduce((sum, m) => sum + m.lessons.length, 0)} total lessons
               </span>
             </div>
           </div>

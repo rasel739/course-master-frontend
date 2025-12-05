@@ -6,65 +6,42 @@ import { Search, Eye, Loader2, UserCheck, GraduationCap, TrendingUp } from 'luci
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { courseApi } from '@/helpers/axios/api';
 import { formatDate, getInitials } from '@/utils';
-import { Course } from '@/types';
-
-interface StudentData {
-  _id: string;
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  course: Course;
-  progress: number;
-  enrolledAt: string;
-  completedLessons: any[];
-}
+import { Course, User } from '@/types';
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { fetchAllEnrollments } from '@/redux/features/adminSlice';
+import { fetchCourses } from '@/redux/features/courseSlice';
 
 const AdminStudents = () => {
   const router = useRouter();
-  const [enrollments, setEnrollments] = useState<StudentData[]>([]);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { enrollments, isLoading } = useAppSelector((state) => state.admin);
+  const { courses } = useAppSelector((state) => state.course);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<string>('all');
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const coursesResponse = await courseApi.getCourses({ limit: 100 });
-        const allCourses = coursesResponse.data.data?.courses || [];
-        setCourses(allCourses);
-
-        const enrollmentPromises = allCourses
-          .slice(0, 5)
-          .map((course) => courseApi.getCourseById(course._id));
-
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch students:', error);
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+    dispatch(fetchAllEnrollments());
+    dispatch(fetchCourses());
+  }, [dispatch]);
 
   const filteredEnrollments = enrollments.filter((enrollment) => {
+    const user = enrollment.user as User;
+    const course = enrollment.course as Course;
     const matchesSearch =
-      enrollment.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      enrollment.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      enrollment.course.title.toLowerCase().includes(searchTerm.toLowerCase());
+      user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      course?.title?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesCourse = selectedCourse === 'all' || enrollment.course._id === selectedCourse;
+    const matchesCourse = selectedCourse === 'all' || course?._id === selectedCourse;
 
     return matchesSearch && matchesCourse;
   });
 
   // Calculate statistics
-  const totalStudents = new Set(enrollments.map((e) => e.user._id)).size;
+  const totalStudents = new Set(
+    enrollments.map((e) => (typeof e.user === 'object' ? e.user._id : e.user))
+  ).size;
   const totalEnrollments = enrollments.length;
   const activeStudents = enrollments.filter((e) => e.progress > 0 && e.progress < 100).length;
   const avgProgress =
@@ -203,60 +180,64 @@ const AdminStudents = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredEnrollments.map((enrollment) => (
-                    <tr key={enrollment._id} className='hover:bg-gray-50'>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center space-x-3'>
-                          <div className='w-10 h-10 bg-linear-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm'>
-                            {getInitials(enrollment.user.name)}
+                  filteredEnrollments.map((enrollment) => {
+                    const user = enrollment.user as User;
+                    const course = enrollment.course as Course;
+
+                    return (
+                      <tr key={enrollment._id} className='hover:bg-gray-50'>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center space-x-3'>
+                            <div className='w-10 h-10 bg-linear-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm'>
+                              {getInitials(user?.name || 'Unknown')}
+                            </div>
+                            <div>
+                              <p className='font-medium text-gray-900'>{user?.name || 'Unknown'}</p>
+                              <p className='text-sm text-gray-500'>{user?.email || ''}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className='font-medium text-gray-900'>{enrollment.user.name}</p>
-                            <p className='text-sm text-gray-500'>{enrollment.user.email}</p>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <p className='text-sm text-gray-900 line-clamp-2'>
+                            {course?.title || 'Unknown Course'}
+                          </p>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='flex items-center space-x-2'>
+                            <div className='w-24 bg-gray-200 rounded-full h-2'>
+                              <div
+                                className={`h-2 rounded-full ${enrollment.progress === 100
+                                    ? 'bg-green-600'
+                                    : enrollment.progress > 0
+                                      ? 'bg-blue-600'
+                                      : 'bg-gray-300'
+                                  }`}
+                                style={{ width: `${enrollment.progress}%` }}
+                              />
+                            </div>
+                            <span className='text-sm font-medium text-gray-900'>
+                              {enrollment.progress}%
+                            </span>
                           </div>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <p className='text-sm text-gray-900 line-clamp-2'>
-                          {enrollment.course.title}
-                        </p>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <div className='flex items-center space-x-2'>
-                          <div className='w-24 bg-gray-200 rounded-full h-2'>
-                            <div
-                              className={`h-2 rounded-full ${
-                                enrollment.progress === 100
-                                  ? 'bg-green-600'
-                                  : enrollment.progress > 0
-                                  ? 'bg-blue-600'
-                                  : 'bg-gray-300'
-                              }`}
-                              style={{ width: `${enrollment.progress}%` }}
-                            />
-                          </div>
-                          <span className='text-sm font-medium text-gray-900'>
-                            {enrollment.progress}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4 text-sm text-gray-500'>
-                        {formatDate(enrollment.enrolledAt)}
-                      </td>
-                      <td className='px-6 py-4 text-sm text-gray-900'>
-                        {enrollment.completedLessons.length}
-                      </td>
-                      <td className='px-6 py-4 text-right'>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          onClick={() => router.push(`/admin/students/${enrollment._id}`)}
-                        >
-                          <Eye className='w-4 h-4' />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className='px-6 py-4 text-sm text-gray-500'>
+                          {formatDate(enrollment.enrolledAt)}
+                        </td>
+                        <td className='px-6 py-4 text-sm text-gray-900'>
+                          {enrollment.completedLessons?.length || 0}
+                        </td>
+                        <td className='px-6 py-4 text-right'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => router.push(`/admin/students/${enrollment._id}`)}
+                          >
+                            <Eye className='w-4 h-4' />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

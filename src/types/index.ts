@@ -230,7 +230,7 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
-  meta?: unknown;
+  meta?: Record<string, unknown>;
   statusCode: number;
 }
 
@@ -242,4 +242,55 @@ export interface ApiError {
     message: string;
   }>;
   stack?: string;
+}
+
+export interface EnrollmentPagination {
+  currentPage: number;
+  totalPages: number;
+  totalEnrollments: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface GradeAssignmentResponse {
+  submission: Submission;
+}
+
+export interface AssignmentsPagination {
+  currentPage: number;
+  totalPages: number;
+  totalAssignments: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface AssignmentsResponse {
+  assignments: Assignment[];
+  pagination: AssignmentsPagination;
+}
+
+export interface QuizzesPagination {
+  currentPage: number;
+  totalPages: number;
+  totalQuizzes: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface QuizzesResponse {
+  quizzes: Quiz[];
+  pagination: QuizzesPagination;
+}
+
+export interface AllEnrollmentsPagination {
+  currentPage: number;
+  totalPages: number;
+  totalEnrollments: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface AllEnrollmentsResponse {
+  enrollments: Enrollment[];
+  pagination: AllEnrollmentsPagination;
 }

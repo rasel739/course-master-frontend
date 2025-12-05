@@ -8,6 +8,9 @@ import {
   CreateLessonRequest,
   Enrollment,
   IAnalyticsParams,
+  AssignmentsResponse,
+  QuizzesResponse,
+  AllEnrollmentsResponse,
 } from '@/types';
 import toast from 'react-hot-toast';
 import { adminApi } from '@/helpers/axios/api';
@@ -307,6 +310,52 @@ export const fetchAnalytics = createAsyncThunk<
     return rejectWithValue(message);
   }
 });
+
+export const fetchAssignments = createAsyncThunk<
+  AssignmentsResponse,
+  { page?: number; limit?: number } | undefined,
+  { rejectValue: string }
+>('admin/fetchAssignments', async (params, { rejectWithValue }) => {
+  try {
+    const response = await adminApi.getAssignments(params);
+    return response.data.data!;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    toast.error(message);
+    return rejectWithValue(message);
+  }
+});
+
+export const fetchQuizzes = createAsyncThunk<
+  QuizzesResponse,
+  { page?: number; limit?: number } | undefined,
+  { rejectValue: string }
+>('admin/fetchQuizzes', async (params, { rejectWithValue }) => {
+  try {
+    const response = await adminApi.getQuizzes(params);
+    return response.data.data!;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    toast.error(message);
+    return rejectWithValue(message);
+  }
+});
+
+export const fetchAllEnrollments = createAsyncThunk<
+  AllEnrollmentsResponse,
+  { page?: number; limit?: number } | undefined,
+  { rejectValue: string }
+>('admin/fetchAllEnrollments', async (params, { rejectWithValue }) => {
+  try {
+    const response = await adminApi.getAllEnrollments(params);
+    return response.data.data!;
+  } catch (error) {
+    const message = getErrorMessage(error);
+    toast.error(message);
+    return rejectWithValue(message);
+  }
+});
+
 const adminSlice = createSlice({
   name: 'admin',
   initialState,
@@ -435,6 +484,51 @@ const adminSlice = createSlice({
         state.analytics = action.payload;
       })
       .addCase(fetchAnalytics.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch Assignments
+    builder
+      .addCase(fetchAssignments.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAssignments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignments = action.payload.assignments;
+      })
+      .addCase(fetchAssignments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch Quizzes
+    builder
+      .addCase(fetchQuizzes.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchQuizzes.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.quizzes = action.payload.quizzes;
+      })
+      .addCase(fetchQuizzes.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch All Enrollments
+    builder
+      .addCase(fetchAllEnrollments.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllEnrollments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.enrollments = action.payload.enrollments;
+      })
+      .addCase(fetchAllEnrollments.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });

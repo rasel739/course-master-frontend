@@ -126,7 +126,7 @@ const Course = () => {
               <Card
                 key={course._id}
                 className='hover:shadow-xl transition-all cursor-pointer group'
-                onClick={() => router.push(`/course/${course._id}`)}
+                onClick={() => router.push(`/courses/${course._id}`)}
               >
                 <div className='relative h-48 bg-linear-to-br from-blue-500 to-purple-600 overflow-hidden rounded-t-lg'>
                   <div className='absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all' />

@@ -1,59 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, FileText, Users, CheckCircle, Clock, Eye } from 'lucide-react';
+import { Plus, Search, FileText, Users, CheckCircle, Clock, Eye, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDate } from '@/utils';
 import AssignmentDialog from '@/components/admin/assignment-dialog';
-
-// Mock data - replace with actual API call
-const mockAssignments = [
-  {
-    _id: '1',
-    title: 'Build a React Component',
-    course: { _id: 'c1', title: 'React Fundamentals' },
-    module: 'm1',
-    description: 'Create a reusable button component with props',
-    submissions: [
-      { _id: 's1', user: 'u1', grade: 85, submittedAt: '2024-01-15' },
-      { _id: 's2', user: 'u2', grade: undefined, submittedAt: '2024-01-16' },
-    ],
-    createdAt: '2024-01-10',
-  },
-  {
-    _id: '2',
-    title: 'Database Design Project',
-    course: { _id: 'c2', title: 'Database Fundamentals' },
-    module: 'm2',
-    description: 'Design a normalized database schema',
-    submissions: [{ _id: 's3', user: 'u3', grade: 92, submittedAt: '2024-01-14' }],
-    createdAt: '2024-01-08',
-  },
-];
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { fetchAssignments } from '@/redux/features/adminSlice';
 
 export default function AdminAssignmentsPage() {
   const router = useRouter();
-  const [assignments] = useState(mockAssignments);
+  const dispatch = useAppDispatch();
+  const { assignments, isLoading } = useAppSelector((state) => state.admin);
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchAssignments());
+  }, [dispatch]);
 
   const filteredAssignments = assignments.filter(
     (assignment) =>
       assignment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment.course.title.toLowerCase().includes(searchTerm.toLowerCase())
+      (typeof assignment.course === 'object' &&
+        assignment.course.title.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Statistics
   const totalAssignments = assignments.length;
-  const totalSubmissions = assignments.reduce((sum, a) => sum + a.submissions.length, 0);
+  const totalSubmissions = assignments.reduce((sum, a) => sum + (a.submissions?.length || 0), 0);
   const gradedSubmissions = assignments.reduce(
-    (sum, a) => sum + a.submissions.filter((s) => s.grade !== undefined).length,
+    (sum, a) => sum + (a.submissions?.filter((s) => s.grade !== undefined).length || 0),
     0
   );
   const pendingGrading = totalSubmissions - gradedSubmissions;
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center h-96'>
+        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>
@@ -168,10 +159,14 @@ export default function AdminAssignmentsPage() {
                   </tr>
                 ) : (
                   filteredAssignments.map((assignment) => {
-                    const graded = assignment.submissions.filter(
+                    const graded = assignment.submissions?.filter(
                       (s) => s.grade !== undefined
-                    ).length;
-                    const pending = assignment.submissions.length - graded;
+                    ).length || 0;
+                    const pending = (assignment.submissions?.length || 0) - graded;
+                    const courseTitle =
+                      typeof assignment.course === 'object'
+                        ? assignment.course.title
+                        : 'Unknown Course';
 
                     return (
                       <tr key={assignment._id} className='hover:bg-gray-50'>
@@ -185,12 +180,12 @@ export default function AdminAssignmentsPage() {
                         </td>
                         <td className='px-6 py-4'>
                           <span className='px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800'>
-                            {assignment.course.title}
+                            {courseTitle}
                           </span>
                         </td>
                         <td className='px-6 py-4'>
                           <span className='text-sm font-medium text-gray-900'>
-                            {assignment.submissions.length}
+                            {assignment.submissions?.length || 0}
                           </span>
                         </td>
                         <td className='px-6 py-4'>

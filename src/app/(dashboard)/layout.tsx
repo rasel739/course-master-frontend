@@ -15,7 +15,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { sidebarOpen } = useAppSelector((state) => state.ui);
-
   useEffect(() => {
     const token = Cookies.get('accessToken');
 
@@ -25,14 +24,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [dispatch, isAuthenticated, isLoading]);
 
   const handleLogout = async () => {
-    await dispatch(logoutUser());
-    router.push('/login');
+    try {
+      await dispatch(logoutUser()).unwrap();
+      router.push('/login');
+    } catch {
+      router.push('/login');
+    }
   };
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Course', href: '/courses', icon: BookOpen },
-    { name: 'My Enrollments', href: '/enrollments', icon: BarChart3 },
+    { name: 'My Enrollments', href: '/enrollment', icon: BarChart3 },
   ];
 
   if (user?.role === 'admin') {

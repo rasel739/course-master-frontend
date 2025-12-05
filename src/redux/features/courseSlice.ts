@@ -31,7 +31,7 @@ const initialState: CourseState = {
 // Async thunks
 export const fetchCourses = createAsyncThunk(
   'course/fetchCourses',
-  async (query?: CourseQuery | undefined, { rejectWithValue }) => {
+  async (query: CourseQuery, { rejectWithValue }) => {
     try {
       const response = await courseApi.getCourses(query);
       return response.data.data!;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { clearError, loginUser } from '@/redux/features/authSlice';
 import { loginSchema } from '@/schema';
 
-const Login = () => {
+const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
@@ -111,6 +111,24 @@ const Login = () => {
         </CardContent>
       </Card>
     </div>
+  );
+};
+
+const LoginFallback = () => (
+  <div className='min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4'>
+    <Card className='w-full max-w-md'>
+      <CardContent className='p-8 flex items-center justify-center'>
+        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
+      </CardContent>
+    </Card>
+  </div>
+);
+
+const Login = () => {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginContent />
+    </Suspense>
   );
 };
 

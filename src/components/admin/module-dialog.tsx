@@ -1,19 +1,19 @@
 'use client';
 
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { X, Loader2 } from 'lucide-react';
-import { CreateModuleRequest } from '@/types';
+import { CreateModuleRequest, Module } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { addModule, updateModule } from '@/redux/features/adminSlice';
 import { moduleSchema } from '@/schema';
 
 interface ModuleDialogProps {
   courseId: string;
-  module?: any;
+  module?: Module;
   open: boolean;
   onClose: () => void;
 }
@@ -27,13 +27,13 @@ const ModuleDialog = ({ courseId, module, open, onClose }: ModuleDialogProps) =>
     handleSubmit,
     formState: { errors },
   } = useForm<CreateModuleRequest>({
-    resolver: yupResolver(moduleSchema),
+    resolver: yupResolver(moduleSchema) as Resolver<CreateModuleRequest>,
     defaultValues: module
       ? {
-          title: module.title,
-          description: module.description || '',
-          order: module.order,
-        }
+        title: module.title,
+        description: module.description || '',
+        order: module.order,
+      }
       : undefined,
   });
 

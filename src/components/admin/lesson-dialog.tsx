@@ -1,12 +1,12 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { X, Loader2 } from 'lucide-react';
-import { CreateLessonRequest } from '@/types';
+import { CreateLessonRequest, Lesson } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { addLesson, updateLesson } from '@/redux/features/adminSlice';
 import { lessonSchema } from '@/schema';
@@ -14,7 +14,7 @@ import { lessonSchema } from '@/schema';
 interface LessonDialogProps {
   courseId: string;
   moduleId: string;
-  lesson?: any;
+  lesson?: Lesson;
   open: boolean;
   onClose: () => void;
 }
@@ -28,14 +28,14 @@ const LessonDialog = ({ courseId, moduleId, lesson, open, onClose }: LessonDialo
     handleSubmit,
     formState: { errors },
   } = useForm<CreateLessonRequest>({
-    resolver: yupResolver(lessonSchema),
+    resolver: yupResolver(lessonSchema) as Resolver<CreateLessonRequest>,
     defaultValues: lesson
       ? {
-          title: lesson.title,
-          videoUrl: lesson.videoUrl,
-          duration: lesson.duration,
-          order: lesson.order,
-        }
+        title: lesson.title,
+        videoUrl: lesson.videoUrl,
+        duration: lesson.duration,
+        order: lesson.order,
+      }
       : undefined,
   });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,7 +34,7 @@ export default function CreateCoursePage() {
     handleSubmit,
     formState: { errors },
   } = useForm<CourseFormData>({
-    resolver: yupResolver(createCourseSchema),
+    resolver: yupResolver(createCourseSchema) as Resolver<CourseFormData>,
   });
 
   const onSubmit: SubmitHandler<CourseFormData> = async (data) => {

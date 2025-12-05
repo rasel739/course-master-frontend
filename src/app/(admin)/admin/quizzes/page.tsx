@@ -1,88 +1,69 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, ClipboardList, Users, TrendingUp, Award, Eye } from 'lucide-react';
+import { Plus, Search, ClipboardList, Users, TrendingUp, Award, Eye, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDate } from '@/utils';
 import QuizDialog from '@/components/admin/quiz-dialog';
-
-const mockQuizzes = [
-  {
-    _id: '1',
-    title: 'React Hooks Quiz',
-    course: { _id: 'c1', title: 'React Fundamentals' },
-    module: 'm1',
-    questions: [
-      {
-        question: 'What is useState?',
-        options: ['Hook', 'Component', 'Function', 'Class'],
-        correctAnswer: 0,
-      },
-      {
-        question: 'What does useEffect do?',
-        options: ['Side effects', 'Styling', 'Routing', 'Testing'],
-        correctAnswer: 0,
-      },
-    ],
-    attempts: [
-      { _id: 'a1', user: 'u1', score: 100, attemptedAt: '2024-01-15' },
-      { _id: 'a2', user: 'u2', score: 50, attemptedAt: '2024-01-16' },
-      { _id: 'a3', user: 'u3', score: 100, attemptedAt: '2024-01-17' },
-    ],
-    createdAt: '2024-01-10',
-  },
-  {
-    _id: '2',
-    title: 'SQL Basics Quiz',
-    course: { _id: 'c2', title: 'Database Fundamentals' },
-    module: 'm2',
-    questions: [
-      {
-        question: 'What is SELECT used for?',
-        options: ['Query data', 'Insert data', 'Delete data', 'Update data'],
-        correctAnswer: 0,
-      },
-    ],
-    attempts: [{ _id: 'a4', user: 'u4', score: 100, attemptedAt: '2024-01-14' }],
-    createdAt: '2024-01-08',
-  },
-];
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { fetchQuizzes } from '@/redux/features/adminSlice';
 
 const AdminQuizzes = () => {
   const router = useRouter();
-  const [quizzes] = useState(mockQuizzes);
+  const dispatch = useAppDispatch();
+  const { quizzes, isLoading } = useAppSelector((state) => state.admin);
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchQuizzes());
+  }, [dispatch]);
 
   const filteredQuizzes = quizzes.filter(
     (quiz) =>
       quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quiz.course.title.toLowerCase().includes(searchTerm.toLowerCase())
+      (typeof quiz.course === 'object' &&
+        quiz.course.title.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Statistics
   const totalQuizzes = quizzes.length;
-  const totalAttempts = quizzes.reduce((sum, q) => sum + q.attempts.length, 0);
+  const totalAttempts = quizzes.reduce((sum, q) => sum + (q.attempts?.length || 0), 0);
   const avgScore =
     totalAttempts > 0
       ? Math.round(
-          quizzes.reduce(
-            (sum, q) => sum + q.attempts.reduce((s, a) => s + a.score, 0) / q.attempts.length,
-            0
-          ) / quizzes.length
-        )
+        quizzes.reduce(
+          (sum, q) =>
+            sum +
+            (q.attempts?.length
+              ? q.attempts.reduce((s, a) => s + a.score, 0) / q.attempts.length
+              : 0),
+          0
+        ) / (quizzes.filter((q) => q.attempts?.length).length || 1)
+      )
       : 0;
   const passRate =
     totalAttempts > 0
       ? Math.round(
-          (quizzes.reduce((sum, q) => sum + q.attempts.filter((a) => a.score >= 70).length, 0) /
-            totalAttempts) *
-            100
-        )
+        (quizzes.reduce(
+          (sum, q) => sum + (q.attempts?.filter((a) => a.score >= 70).length || 0),
+          0
+        ) /
+          totalAttempts) *
+        100
+      )
       : 0;
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center h-96'>
+        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>
@@ -201,12 +182,13 @@ const AdminQuizzes = () => {
                 ) : (
                   filteredQuizzes.map((quiz) => {
                     const quizAvgScore =
-                      quiz.attempts.length > 0
+                      quiz.attempts?.length
                         ? Math.round(
-                            quiz.attempts.reduce((sum, a) => sum + a.score, 0) /
-                              quiz.attempts.length
-                          )
+                          quiz.attempts.reduce((sum, a) => sum + a.score, 0) / quiz.attempts.length
+                        )
                         : 0;
+                    const courseTitle =
+                      typeof quiz.course === 'object' ? quiz.course.title : 'Unknown Course';
 
                     return (
                       <tr key={quiz._id} className='hover:bg-gray-50'>
@@ -215,30 +197,29 @@ const AdminQuizzes = () => {
                         </td>
                         <td className='px-6 py-4'>
                           <span className='px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800'>
-                            {quiz.course.title}
+                            {courseTitle}
                           </span>
                         </td>
                         <td className='px-6 py-4'>
                           <span className='text-sm font-medium text-gray-900'>
-                            {quiz.questions.length}
+                            {quiz.questions?.length || 0}
                           </span>
                         </td>
                         <td className='px-6 py-4'>
                           <span className='text-sm font-medium text-gray-900'>
-                            {quiz.attempts.length}
+                            {quiz.attempts?.length || 0}
                           </span>
                         </td>
                         <td className='px-6 py-4'>
                           <div className='flex items-center space-x-2'>
                             <div className='w-16 bg-gray-200 rounded-full h-2'>
                               <div
-                                className={`h-2 rounded-full ${
-                                  quizAvgScore >= 70
+                                className={`h-2 rounded-full ${quizAvgScore >= 70
                                     ? 'bg-green-600'
                                     : quizAvgScore >= 50
-                                    ? 'bg-yellow-600'
-                                    : 'bg-red-600'
-                                }`}
+                                      ? 'bg-yellow-600'
+                                      : 'bg-red-600'
+                                  }`}
                                 style={{ width: `${quizAvgScore}%` }}
                               />
                             </div>

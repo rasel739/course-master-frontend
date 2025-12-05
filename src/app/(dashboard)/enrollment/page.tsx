@@ -14,7 +14,7 @@ const Enrollment = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { enrollments, isLoading } = useAppSelector((state) => state.enrollment);
-
+  console.log(enrollments);
   useEffect(() => {
     dispatch(fetchDashboard());
   }, [dispatch]);
@@ -42,7 +42,7 @@ const Enrollment = () => {
                 <BookOpen className='w-6 h-6 text-blue-600' />
               </div>
             </div>
-            <h3 className='text-2xl font-bold text-gray-900 mb-1'>{enrollments.length}</h3>
+            <h3 className='text-2xl font-bold text-gray-900 mb-1'>{enrollments?.length}</h3>
             <p className='text-sm text-gray-600'>Total Enrollments</p>
           </CardContent>
         </Card>
@@ -55,7 +55,7 @@ const Enrollment = () => {
               </div>
             </div>
             <h3 className='text-2xl font-bold text-gray-900 mb-1'>
-              {enrollments.filter((e) => e.progress > 0 && e.progress < 100).length}
+              {enrollments?.filter((e) => e.progress > 0 && e.progress < 100).length}
             </h3>
             <p className='text-sm text-gray-600'>In Progress</p>
           </CardContent>
@@ -69,14 +69,14 @@ const Enrollment = () => {
               </div>
             </div>
             <h3 className='text-2xl font-bold text-gray-900 mb-1'>
-              {enrollments.filter((e) => e.progress === 100).length}
+              {enrollments?.filter((e) => e.progress === 100).length}
             </h3>
             <p className='text-sm text-gray-600'>Completed</p>
           </CardContent>
         </Card>
       </div>
 
-      {enrollments.length === 0 ? (
+      {enrollments?.length === 0 ? (
         <Card>
           <CardContent className='p-12 text-center'>
             <BookOpen className='w-16 h-16 text-gray-400 mx-auto mb-4' />
@@ -87,10 +87,10 @@ const Enrollment = () => {
         </Card>
       ) : (
         <div className='space-y-4'>
-          {enrollments.map((enrollment) => {
+          {enrollments?.map((enrollment) => {
             const course = enrollment.course as Course;
             const progressColor =
-              enrollment.progress === 100
+              enrollment?.progress === 100
                 ? 'bg-green-600'
                 : enrollment.progress > 0
                 ? 'bg-blue-600'
@@ -100,7 +100,7 @@ const Enrollment = () => {
               <Card
                 key={enrollment._id}
                 className='hover:shadow-lg transition-shadow cursor-pointer'
-                onClick={() => router.push(`/enrollments/${enrollment._id}`)}
+                onClick={() => router.push(`/enrollments/${enrollment?._id}`)}
               >
                 <CardContent className='p-6'>
                   <div className='flex flex-col md:flex-row md:items-center gap-6'>
@@ -148,7 +148,7 @@ const Enrollment = () => {
                       <div>
                         <Button size='sm' className='group'>
                           <Play className='w-4 h-4 mr-2 group-hover:scale-110 transition-transform' />
-                          {enrollment.progress === 100 ? 'Review Course' : 'Continue Learning'}
+                          {enrollment?.progress === 100 ? 'Review Course' : 'Continue Learning'}
                         </Button>
                       </div>
                     </div>
