@@ -75,8 +75,8 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    const errorMessage =
-      (error.response?.data as any)?.message || error.message || 'An unexpected error occurred';
+    const errorData = error.response?.data as { message?: string; error?: string } | undefined;
+    const errorMessage = errorData?.message || errorData?.error || error.message || 'An unexpected error occurred';
 
     if (error.response?.status !== 401) {
       toast.error(errorMessage);

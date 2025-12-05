@@ -41,10 +41,7 @@ const Register = () => {
   }, [dispatch]);
 
   const onSubmit: SubmitHandler<IRegister> = async (data) => {
-    console.log(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmPassword, ...registerData } = data;
-    await dispatch(registerUser(registerData));
+    await dispatch(registerUser(data));
   };
 
   return (

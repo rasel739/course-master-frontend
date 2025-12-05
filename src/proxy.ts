@@ -5,7 +5,7 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get('accessToken')?.value;
   const { pathname } = request.nextUrl;
 
-  const publicRoutes = ['/', '/courses', '/login', '/register'];
+  const publicRoutes = ['/', '/login', '/register'];
 
   if (!token && !publicRoutes.includes(pathname)) {
     const loginUrl = new URL('/login', request.url);

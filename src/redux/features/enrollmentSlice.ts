@@ -39,6 +39,7 @@ export const fetchDashboard = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await studentApi.getDashboard();
+      console.log('redux :', response.data.data?.enrollments);
       return response.data.data!.enrollments;
     } catch (error: unknown) {
       const message = getErrorMessage(error);

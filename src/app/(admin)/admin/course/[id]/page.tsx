@@ -20,6 +20,7 @@ import { setSelectedCourse, deleteModule, deleteLesson } from '@/redux/features/
 import { formatPrice } from '@/utils';
 import ModuleDialog from '@/components/admin/module-dialog';
 import LessonDialog from '@/components/admin/lesson-dialog';
+import { Module, Lesson } from '@/types';
 
 const AdminCourseDetails = () => {
   const params = useParams();
@@ -30,8 +31,8 @@ const AdminCourseDetails = () => {
   const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
   const [lessonDialogOpen, setLessonDialogOpen] = useState(false);
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
-  const [editingModule, setEditingModule] = useState<any>(null);
-  const [editingLesson, setEditingLesson] = useState<any>(null);
+  const [editingModule, setEditingModule] = useState<Module | null>(null);
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -70,7 +71,7 @@ const AdminCourseDetails = () => {
     setModuleDialogOpen(true);
   };
 
-  const openEditModuleDialog = (module: any) => {
+  const openEditModuleDialog = (module: Module) => {
     setEditingModule(module);
     setModuleDialogOpen(true);
   };
@@ -81,7 +82,7 @@ const AdminCourseDetails = () => {
     setLessonDialogOpen(true);
   };
 
-  const openEditLessonDialog = (moduleId: string, lesson: any) => {
+  const openEditLessonDialog = (moduleId: string, lesson: Lesson) => {
     setSelectedModuleId(moduleId);
     setEditingLesson(lesson);
     setLessonDialogOpen(true);
@@ -282,7 +283,7 @@ const AdminCourseDetails = () => {
       {moduleDialogOpen && (
         <ModuleDialog
           courseId={course._id}
-          module={editingModule}
+          module={editingModule || undefined}
           open={moduleDialogOpen}
           onClose={() => {
             setModuleDialogOpen(false);
@@ -296,7 +297,7 @@ const AdminCourseDetails = () => {
         <LessonDialog
           courseId={course._id}
           moduleId={selectedModuleId}
-          lesson={editingLesson}
+          lesson={editingLesson || undefined}
           open={lessonDialogOpen}
           onClose={() => {
             setLessonDialogOpen(false);

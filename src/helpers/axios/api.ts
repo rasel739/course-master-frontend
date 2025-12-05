@@ -8,6 +8,7 @@ import {
   CourseResponse,
   Course,
   Enrollment,
+  EnrollmentPagination,
   MarkLessonCompleteRequest,
   SubmitAssignmentRequest,
   SubmitQuizResponse,
@@ -18,6 +19,10 @@ import {
   ReorderRequest,
   IAnalyticsData,
   ApiResponse,
+  Submission,
+  AssignmentsResponse,
+  QuizzesResponse,
+  AllEnrollmentsResponse,
 } from '@/types';
 
 export const authApi = {
@@ -35,7 +40,7 @@ export const authApi = {
 };
 
 export const courseApi = {
-  getCourses: (params?: CourseQuery) =>
+  getCourses: (params: CourseQuery) =>
     axiosInstance.get<ApiResponse<CourseResponse>>('/course', { params }),
 
   getCourseById: (id: string) => axiosInstance.get<ApiResponse<Course>>(`/course/${id}`),
@@ -85,7 +90,7 @@ export const adminApi = {
     axiosInstance.get<
       ApiResponse<{
         enrollments: Enrollment[];
-        pagination: any;
+        pagination: EnrollmentPagination;
       }>
     >(`/admin/courses/${courseId}/enrollments`, { params }),
 
@@ -142,7 +147,7 @@ export const adminApi = {
     submissionId: string,
     data: { grade: number; feedback?: string }
   ) =>
-    axiosInstance.put<ApiResponse<any>>(
+    axiosInstance.put<ApiResponse<{ submission: Submission }>>(
       `/admin/assignments/${assignmentId}/submissions/${submissionId}/grade`,
       data
     ),
@@ -154,4 +159,13 @@ export const adminApi = {
     axiosInstance.get<ApiResponse<IAnalyticsData>>('/admin/analytics', {
       params,
     }),
+
+  getAssignments: (params?: { page?: number; limit?: number }) =>
+    axiosInstance.get<ApiResponse<AssignmentsResponse>>('/admin/assignments', { params }),
+
+  getQuizzes: (params?: { page?: number; limit?: number }) =>
+    axiosInstance.get<ApiResponse<QuizzesResponse>>('/admin/quizzes', { params }),
+
+  getAllEnrollments: (params?: { page?: number; limit?: number }) =>
+    axiosInstance.get<ApiResponse<AllEnrollmentsResponse>>('/admin/enrollments', { params }),
 };

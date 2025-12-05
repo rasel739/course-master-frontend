@@ -205,16 +205,14 @@ const QuizDialog = ({ open, onClose }: QuizDialogProps) => {
                 {/* Options */}
                 <div className='space-y-2'>
                   <Label>Options *</Label>
-                  {[0, 1, 2, 3].map((optionIndex) => (
+                  {([0, 1, 2, 3] as const).map((optionIndex) => (
                     <div key={optionIndex} className='flex items-center space-x-2'>
                       <span className='text-sm font-medium text-gray-600 w-8'>
                         {String.fromCharCode(65 + optionIndex)}.
                       </span>
                       <Input
                         placeholder={`Option ${String.fromCharCode(65 + optionIndex)}`}
-                        {...register(`questions.${index}.options.${optionIndex}`, {
-                          required: true,
-                        })}
+                        {...register(`questions.${index}.options.${optionIndex}`)}
                       />
                     </div>
                   ))}

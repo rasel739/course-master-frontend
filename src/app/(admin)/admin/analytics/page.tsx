@@ -59,7 +59,7 @@ export default function AdminAnalyticsPage() {
           <select
             className='h-10 rounded-md border border-gray-300 bg-white px-3 text-sm'
             value={dateRange}
-            onChange={(e) => setDateRange(e.target.value as any)}
+            onChange={(e) => setDateRange(e.target.value as '7d' | '30d' | '90d' | 'all')}
           >
             <option value='7d'>Last 7 days</option>
             <option value='30d'>Last 30 days</option>

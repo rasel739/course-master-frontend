@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
 import {
   GraduationCap,
@@ -17,7 +18,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-import toast from 'react-hot-toast';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCurrentUser, logoutUser } from '@/redux/features/authSlice';
 import { toggleSidebar } from '@/redux/features/uiSlice';
@@ -30,21 +30,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { sidebarOpen } = useAppSelector((state) => state.ui);
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    const token = Cookies.get('accessToken');
+
+    if (token && !isAuthenticated && !isLoading) {
       dispatch(fetchCurrentUser());
     }
   }, [dispatch, isAuthenticated, isLoading]);
 
+
   useEffect(() => {
-    if (user && user.role !== 'admin') {
-      toast.error('Access denied. Admin privileges required.');
-      router.push('/dashboard');
+    const token = Cookies.get('accessToken');
+    if (!token && !isLoading) {
+      router.push('/login');
     }
-  }, [user, router]);
+  }, [isLoading, router]);
+
+
+  if (isLoading || !user) {
+    return null;
+  }
+
+
+  if (user.role !== 'admin') {
+    router.push('/dashboard');
+    return null;
+  }
 
   const handleLogout = async () => {
-    await dispatch(logoutUser());
-    router.push('/login');
+    try {
+      await dispatch(logoutUser()).unwrap();
+      router.push('/login');
+    } catch {
+      router.push('/login');
+    }
   };
 
   const navigation = [
@@ -56,17 +74,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   ];
 
-  if (user?.role !== 'admin') {
-    return null;
-  }
-
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-linear-to-b from-blue-600 to-purple-700 text-white transform transition-transform duration-200 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-linear-to-b from-blue-600 to-purple-700 text-white transform transition-transform duration-200 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
       >
         <div className='flex flex-col h-full'>
           {/* Logo */}
