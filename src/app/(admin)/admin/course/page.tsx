@@ -137,14 +137,14 @@ const AdminCourse = () => {
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
-                {filteredCourses.length === 0 ? (
+                {filteredCourses?.length === 0 ? (
                   <tr>
                     <td colSpan={7} className='px-6 py-12 text-center text-gray-500'>
                       No courses found
                     </td>
                   </tr>
                 ) : (
-                  filteredCourses.map((course) => (
+                  filteredCourses?.map((course) => (
                     <tr key={course._id} className='hover:bg-gray-50'>
                       <td className='px-6 py-4'>
                         <div>
