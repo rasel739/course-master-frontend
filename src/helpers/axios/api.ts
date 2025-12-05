@@ -16,7 +16,7 @@ import {
   CreateModuleRequest,
   CreateLessonRequest,
   ReorderRequest,
-  AnalyticsData,
+  IAnalyticsData,
   ApiResponse,
 } from '@/types';
 
@@ -151,7 +151,7 @@ export const adminApi = {
     axiosInstance.post<ApiResponse<Quiz>>('/admin/quizzes', data),
 
   getAnalytics: (params?: { startDate?: string; endDate?: string }) =>
-    axiosInstance.get<ApiResponse<AnalyticsData>>('/admin/analytics', {
+    axiosInstance.get<ApiResponse<IAnalyticsData>>('/admin/analytics', {
       params,
     }),
 };

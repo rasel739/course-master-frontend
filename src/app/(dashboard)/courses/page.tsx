@@ -16,19 +16,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 
-import { CourseCategory } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCourses, setFilters } from '@/redux/features/courseSlice';
 import { debounce, formatDuration, formatPrice } from '@/utils';
-
-const categories: CourseCategory[] = [
-  'Web Development',
-  'Mobile Development',
-  'Data Science',
-  'AI/ML',
-  'DevOps',
-  'Other',
-];
+import { categories } from '@/constants';
 
 const Course = () => {
   const router = useRouter();
@@ -135,7 +126,7 @@ const Course = () => {
               <Card
                 key={course._id}
                 className='hover:shadow-xl transition-all cursor-pointer group'
-                onClick={() => router.push(`/courses/${course._id}`)}
+                onClick={() => router.push(`/course/${course._id}`)}
               >
                 <div className='relative h-48 bg-linear-to-br from-blue-500 to-purple-600 overflow-hidden rounded-t-lg'>
                   <div className='absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all' />

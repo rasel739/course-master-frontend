@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/authSlice';
 import courseReducer from './features/courseSlice';
 import enrollmentReducer from './features/enrollmentSlice';
+import adminReducer from './features/adminSlice';
 import uiReducer from './features/uiSlice';
 
 export const store = configureStore({
@@ -9,6 +10,7 @@ export const store = configureStore({
     auth: authReducer,
     course: courseReducer,
     enrollment: enrollmentReducer,
+    admin: adminReducer,
     ui: uiReducer,
   },
   middleware: (getDefaultMiddleware) =>
