@@ -6,9 +6,9 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const publicRoutes = ['/', '/login', '/register'];
-  const publicAndPrivateRoutes = ['/courses'];
+  const alwaysAccessibleRoutes = ['/courses'];
 
-  if (publicAndPrivateRoutes.includes(pathname)) {
+  if (alwaysAccessibleRoutes.includes(pathname)) {
     return NextResponse.next();
   }
 
@@ -18,7 +18,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (token && publicRoutes.includes(pathname)) {
+  if (token && (pathname === '/login' || pathname === '/register')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

@@ -226,7 +226,6 @@ export default function AdminAnalyticsPage() {
         </CardContent>
       </Card>
 
-      {/* Performance Metrics */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <Card>
           <CardHeader>
@@ -235,7 +234,8 @@ export default function AdminAnalyticsPage() {
           <CardContent>
             {analytics?.coursesByCategory ? (
               <div className='space-y-3'>
-                {[...analytics.coursesByCategory]
+                {analytics.coursesByCategory
+                  .map((item) => ({ ...item }))
                   .sort((a, b) => b.totalEnrollments - a.totalEnrollments)
                   .slice(0, 5)
                   .map((category, index) => (

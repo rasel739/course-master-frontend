@@ -136,7 +136,8 @@ const CourseDetails = () => {
             <CardContent className='p-6'>
               <h2 className='text-2xl font-bold text-gray-900 mb-4'>Course Content</h2>
               <div className='space-y-2'>
-                {course.modules
+                {course?.modules
+                  ?.map((module) => ({ ...module }))
                   .sort((a, b) => a.order - b.order)
                   .map((module) => (
                     <div key={module._id} className='border border-gray-200 rounded-lg'>
@@ -164,7 +165,8 @@ const CourseDetails = () => {
 
                       {expandedModules.includes(module._id) && (
                         <div className='border-t border-gray-200'>
-                          {module.lessons
+                          {module?.lessons
+                            ?.map((lesson) => ({ ...lesson }))
                             .sort((a, b) => a.order - b.order)
                             .map((lesson) => (
                               <div

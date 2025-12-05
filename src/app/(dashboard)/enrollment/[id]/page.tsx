@@ -110,7 +110,8 @@ const EnrollmentDetails = () => {
             <CardContent className='p-6'>
               <h2 className='text-xl font-bold text-gray-900 mb-4'>Course Content</h2>
               <div className='space-y-2'>
-                {course.modules
+                {course?.modules
+                  ?.map((module) => ({ ...module }))
                   .sort((a, b) => a.order - b.order)
                   .map((module) => {
                     const completedLessons = module.lessons.filter((lesson) =>
@@ -150,7 +151,8 @@ const EnrollmentDetails = () => {
 
                         {expandedModules.includes(module._id) && (
                           <div className='border-t border-gray-200'>
-                            {module.lessons
+                            {module?.lessons
+                              ?.map((lesson) => ({ ...lesson }))
                               .sort((a, b) => a.order - b.order)
                               .map((lesson) => {
                                 const completed = isLessonCompleted(module._id, lesson._id);

@@ -173,13 +173,14 @@ const AdminCourseDetails = () => {
             </Button>
           </div>
 
-          {course.modules.length === 0 ? (
+          {course?.modules.length === 0 ? (
             <div className='text-center py-12 text-gray-500'>
               <p>No modules yet. Add your first module to get started.</p>
             </div>
           ) : (
             <div className='space-y-2'>
-              {course.modules
+              {course?.modules
+                ?.map((module) => ({ ...module }))
                 .sort((a, b) => a.order - b.order)
                 .map((module) => (
                   <div key={module._id} className='border border-gray-200 rounded-lg'>
@@ -235,7 +236,8 @@ const AdminCourseDetails = () => {
                             No lessons yet. Add your first lesson.
                           </div>
                         ) : (
-                          module.lessons
+                          module?.lessons
+                            ?.map((lesson) => ({ ...lesson }))
                             .sort((a, b) => a.order - b.order)
                             .map((lesson) => (
                               <div
