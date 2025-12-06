@@ -15,7 +15,9 @@ export function formatDuration(minutes: number): string {
 }
 
 export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('en-US', {
+  const parsed = new Date(date);
+  if (isNaN(parsed.getTime())) return 'Invalid date';
+  return parsed.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -35,15 +37,16 @@ export function truncateText(text: string, length: number): string {
 }
 
 export function getInitials(name: string): string {
+  if (!name || name.trim().length === 0) return '?';
   return name
     .split(' ')
+    .filter((word) => word.length > 0)
     .map((word) => word[0])
     .join('')
     .toUpperCase()
-    .slice(0, 2);
+    .slice(0, 2) || '?';
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
   wait: number

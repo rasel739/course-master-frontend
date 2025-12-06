@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, Edit, Trash2, Eye, Loader2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCourses } from '@/redux/features/courseSlice';
 import { deleteCourse } from '@/redux/features/adminSlice';
 import { formatPrice, formatDate } from '@/utils';
+import Loading from '@/app/loading';
 
 const AdminCourse = () => {
   const router = useRouter();
@@ -41,11 +42,7 @@ const AdminCourse = () => {
   );
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

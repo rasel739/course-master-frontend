@@ -1,39 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, Users, GraduationCap, TrendingUp, Loader2, ChevronRight } from 'lucide-react';
+import { BookOpen, Users, GraduationCap, TrendingUp, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { IAnalyticsData } from '@/types';
-import { adminApi } from '@/helpers/axios/api';
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { fetchAnalytics } from '@/redux/features/adminSlice';
+import Loading from '@/app/loading';
 
 const AdminDashboard = () => {
   const router = useRouter();
-  const [analytics, setAnalytics] = useState<IAnalyticsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { analytics, isLoading } = useAppSelector((state) => state.admin);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const response = await adminApi.getAnalytics();
-        setAnalytics(response.data.data!);
-      } catch (error) {
-        console.error('Failed to fetch analytics:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAnalytics();
-  }, []);
+    dispatch(fetchAnalytics(undefined));
+  }, [dispatch]);
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   const stats = [

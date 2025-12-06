@@ -3,13 +3,14 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BookOpen, TrendingUp, Award, Clock, Play, ChevronRight, Loader2 } from 'lucide-react';
+import { BookOpen, TrendingUp, Award, Clock, Play, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 import { Course } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchDashboard } from '@/redux/features/enrollmentSlice';
+import Loading from '@/app/loading';
 
 const Dashboard = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const Dashboard = () => {
   const { enrollments, isLoading } = useAppSelector((state) => state.enrollment);
 
   useEffect(() => {
-    dispatch(fetchDashboard()).unwrap();
+    dispatch(fetchDashboard());
   }, [dispatch]);
 
   const stats = [
@@ -53,11 +54,7 @@ const Dashboard = () => {
   ];
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

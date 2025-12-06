@@ -1,7 +1,7 @@
 'use client';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GraduationCap, Home, BookOpen, BarChart3, LogOut, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { sidebarOpen } = useAppSelector((state) => state.ui);
+
+  if (user?.role === 'admin') {
+    redirect('/admin');
+  }
   useEffect(() => {
     const token = Cookies.get('accessToken');
 
@@ -37,14 +41,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Course', href: '/courses', icon: BookOpen },
     { name: 'My Enrollments', href: '/enrollment', icon: BarChart3 },
   ];
-
-  if (user?.role === 'admin') {
-    navigation.push({
-      name: 'Admin Panel',
-      href: '/admin',
-      icon: BarChart3,
-    });
-  }
 
   return (
     <div className='min-h-screen bg-gray-50'>

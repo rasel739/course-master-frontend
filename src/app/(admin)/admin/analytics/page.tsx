@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen, Users, GraduationCap, TrendingUp, Loader2, Download } from 'lucide-react';
+import { BookOpen, Users, GraduationCap, TrendingUp, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchAnalytics } from '@/redux/features/adminSlice';
+import Loading from '@/app/loading';
 
 export default function AdminAnalyticsPage() {
   const dispatch = useAppDispatch();
@@ -13,7 +14,6 @@ export default function AdminAnalyticsPage() {
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
 
   useEffect(() => {
-    // Calculate date range
     let startDate: string | undefined;
     const endDate = new Date().toISOString().split('T')[0];
 
@@ -37,14 +37,11 @@ export default function AdminAnalyticsPage() {
     a.href = url;
     a.download = `analytics-${new Date().toISOString()}.json`;
     a.click();
+    URL.revokeObjectURL(url);
   };
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
