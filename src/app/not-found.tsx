@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Home, ArrowLeft, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function NotFound() {
+const NotFound = () => {
   return (
     <div className='min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-4'>
       <div className='max-w-lg w-full text-center'>
@@ -53,4 +53,5 @@ export default function NotFound() {
       </div>
     </div>
   );
-}
+};
+export default NotFound;

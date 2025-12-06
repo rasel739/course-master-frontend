@@ -9,7 +9,7 @@ interface GlobalErrorProps {
   reset: () => void;
 }
 
-export default function GlobalError({ error, reset }: GlobalErrorProps) {
+const GlobalError = ({ error, reset }: GlobalErrorProps) => {
   useEffect(() => {
     console.error('Global error:', error);
   }, [error]);
@@ -65,4 +65,5 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
       </body>
     </html>
   );
-}
+};
+export default GlobalError;
