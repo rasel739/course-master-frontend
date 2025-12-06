@@ -11,6 +11,7 @@ import { Course } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchDashboard } from '@/redux/features/enrollmentSlice';
 import Loading from '@/app/loading';
+import Image from 'next/image';
 
 const Dashboard = () => {
   const router = useRouter();
@@ -89,7 +90,7 @@ const Dashboard = () => {
         <div>
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-2xl font-bold text-gray-900'>Continue Learning</h2>
-            <Link href='/enrollments'>
+            <Link href='/enrollment'>
               <Button variant='ghost' size='sm'>
                 View All
                 <ChevronRight className='w-4 h-4 ml-1' />
@@ -104,9 +105,10 @@ const Dashboard = () => {
                 <Card
                   key={enrollment._id}
                   className='hover:shadow-lg transition-shadow cursor-pointer'
-                  onClick={() => router.push(`/enrollments/${enrollment._id}`)}
+                  onClick={() => router.push(`/enrollment/${enrollment._id}`)}
                 >
                   <div className='relative h-48 bg-linear-to-br from-blue-500 to-purple-600 rounded-t-lg'>
+                    <Image src={`${course?.thumbnail}`} alt='course-image' fill />
                     <div className='absolute inset-0 bg-black/20' />
                     <div className='absolute bottom-4 left-4 right-4'>
                       <span className='bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-gray-800'>
@@ -182,7 +184,7 @@ const Dashboard = () => {
             </Card>
           </Link>
 
-          <Link href='/enrollments'>
+          <Link href='/enrollment'>
             <Card className='hover:shadow-md transition-shadow cursor-pointer'>
               <CardContent className='p-6 flex items-center space-x-4'>
                 <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
