@@ -97,7 +97,7 @@ const Enrollment = () => {
               <Card
                 key={enrollment._id}
                 className='hover:shadow-lg transition-shadow cursor-pointer'
-                onClick={() => router.push(`/enrollments/${enrollment?._id}`)}
+                onClick={() => router.push(`/enrollment/${enrollment?._id}`)}
               >
                 <CardContent className='p-6'>
                   <div className='flex flex-col md:flex-row md:items-center gap-6'>
