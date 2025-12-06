@@ -1,7 +1,7 @@
 'use client';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { GraduationCap, Home, BookOpen, BarChart3, LogOut, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { sidebarOpen } = useAppSelector((state) => state.ui);
 
-  if (user?.role === 'admin') {
-    redirect('/admin');
-  }
   useEffect(() => {
     const token = Cookies.get('accessToken');
 
@@ -26,6 +23,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       dispatch(fetchCurrentUser());
     }
   }, [dispatch, isAuthenticated, isLoading]);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'admin') {
+      router.replace('/admin');
+    }
+  }, [user, isAuthenticated, router]);
 
   const handleLogout = async () => {
     try {
