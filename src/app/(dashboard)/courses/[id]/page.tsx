@@ -17,8 +17,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCourseById } from '@/redux/features/courseSlice';
 import { enrollInCourse } from '@/redux/features/enrollmentSlice';
-import toast from 'react-hot-toast';
 import { formatDate, formatDuration, formatPrice } from '@/utils';
+import Loading from '@/app/loading';
 
 const CourseDetails = () => {
   const params = useParams();
@@ -48,20 +48,14 @@ const CourseDetails = () => {
     try {
       await dispatch(enrollInCourse(course._id)).unwrap();
       router.push('/dashboard');
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Invalid enroll in courese';
-      toast.error(errorMessage);
+    } catch {
     } finally {
       setEnrolling(false);
     }
   };
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!course) {

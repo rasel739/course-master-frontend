@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Play, CheckCircle, Clock, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
+import { Play, CheckCircle, Clock, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchEnrollmentDetails, markLessonComplete } from '@/redux/features/enrollmentSlice';
 import { Course } from '@/types';
+import Loading from '@/app/loading';
 
 const EnrollmentDetails = () => {
   const params = useParams();
@@ -50,11 +51,7 @@ const EnrollmentDetails = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!enrollment) {

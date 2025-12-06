@@ -3,8 +3,11 @@
 import { GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/button';
+import { useAppSelector } from '@/redux/hook';
 
 const Header = () => {
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
   return (
     <header className='border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50'>
       <div className='container mx-auto px-4'>
@@ -26,12 +29,20 @@ const Header = () => {
           </nav>
 
           <div className='flex items-center space-x-4'>
-            <Link href='/login'>
-              <Button variant='ghost'>Login</Button>
-            </Link>
-            <Link href='/register'>
-              <Button>Get Started</Button>
-            </Link>
+            {isAuthenticated ? (
+              <Link href='/dashboard'>
+                <Button>Go to Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href='/login'>
+                  <Button variant='ghost'>Login</Button>
+                </Link>
+                <Link href='/register'>
+                  <Button>Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

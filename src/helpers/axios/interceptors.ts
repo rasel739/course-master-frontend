@@ -1,6 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
-import toast from 'react-hot-toast';
 import { getBaseUrl } from '../envConfig';
 
 export const axiosInstance = axios.create({
@@ -75,13 +74,7 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    const errorData = error.response?.data as { message?: string; error?: string } | undefined;
-    const errorMessage = errorData?.message || errorData?.error || error.message || 'An unexpected error occurred';
-
-    if (error.response?.status !== 401) {
-      toast.error(errorMessage);
-    }
-
+    // Let thunks decide when to show toast - this prevents duplicate toast messages
     return Promise.reject(error);
   }
 );

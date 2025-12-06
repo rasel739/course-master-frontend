@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, Clock, Play, Loader2, TrendingUp } from 'lucide-react';
+import { BookOpen, Clock, Play, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Course } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchDashboard } from '@/redux/features/enrollmentSlice';
 import { formatDate } from '@/utils';
+import Loading from '@/app/loading';
 
 const Enrollment = () => {
   const router = useRouter();
@@ -20,11 +21,7 @@ const Enrollment = () => {
   }, [dispatch]);
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

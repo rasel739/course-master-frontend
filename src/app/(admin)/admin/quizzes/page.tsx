@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, ClipboardList, Users, TrendingUp, Award, Eye, Loader2 } from 'lucide-react';
+import { Plus, Search, ClipboardList, Users, TrendingUp, Award, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { formatDate } from '@/utils';
 import QuizDialog from '@/components/admin/quiz-dialog';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchQuizzes } from '@/redux/features/adminSlice';
+import Loading from '@/app/loading';
 
 const AdminQuizzes = () => {
   const router = useRouter();
@@ -29,40 +30,35 @@ const AdminQuizzes = () => {
         quiz.course.title.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // Statistics
   const totalQuizzes = quizzes.length;
   const totalAttempts = quizzes.reduce((sum, q) => sum + (q.attempts?.length || 0), 0);
   const avgScore =
     totalAttempts > 0
       ? Math.round(
-        quizzes.reduce(
-          (sum, q) =>
-            sum +
-            (q.attempts?.length
-              ? q.attempts.reduce((s, a) => s + a.score, 0) / q.attempts.length
-              : 0),
-          0
-        ) / (quizzes.filter((q) => q.attempts?.length).length || 1)
-      )
+          quizzes.reduce(
+            (sum, q) =>
+              sum +
+              (q.attempts?.length
+                ? q.attempts.reduce((s, a) => s + a.score, 0) / q.attempts.length
+                : 0),
+            0
+          ) / (quizzes.filter((q) => q.attempts?.length).length || 1)
+        )
       : 0;
   const passRate =
     totalAttempts > 0
       ? Math.round(
-        (quizzes.reduce(
-          (sum, q) => sum + (q.attempts?.filter((a) => a.score >= 70).length || 0),
-          0
-        ) /
-          totalAttempts) *
-        100
-      )
+          (quizzes.reduce(
+            (sum, q) => sum + (q.attempts?.filter((a) => a.score >= 70).length || 0),
+            0
+          ) /
+            totalAttempts) *
+            100
+        )
       : 0;
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -181,12 +177,11 @@ const AdminQuizzes = () => {
                   </tr>
                 ) : (
                   filteredQuizzes.map((quiz) => {
-                    const quizAvgScore =
-                      quiz.attempts?.length
-                        ? Math.round(
+                    const quizAvgScore = quiz.attempts?.length
+                      ? Math.round(
                           quiz.attempts.reduce((sum, a) => sum + a.score, 0) / quiz.attempts.length
                         )
-                        : 0;
+                      : 0;
                     const courseTitle =
                       typeof quiz.course === 'object' ? quiz.course.title : 'Unknown Course';
 
@@ -214,12 +209,13 @@ const AdminQuizzes = () => {
                           <div className='flex items-center space-x-2'>
                             <div className='w-16 bg-gray-200 rounded-full h-2'>
                               <div
-                                className={`h-2 rounded-full ${quizAvgScore >= 70
+                                className={`h-2 rounded-full ${
+                                  quizAvgScore >= 70
                                     ? 'bg-green-600'
                                     : quizAvgScore >= 50
-                                      ? 'bg-yellow-600'
-                                      : 'bg-red-600'
-                                  }`}
+                                    ? 'bg-yellow-600'
+                                    : 'bg-red-600'
+                                }`}
                                 style={{ width: `${quizAvgScore}%` }}
                               />
                             </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Eye, Loader2, UserCheck, GraduationCap, TrendingUp } from 'lucide-react';
+import { Search, Eye, UserCheck, GraduationCap, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,6 +11,7 @@ import { Course, User } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchAllEnrollments } from '@/redux/features/adminSlice';
 import { fetchCourses } from '@/redux/features/courseSlice';
+import Loading from '@/app/loading';
 
 const AdminStudents = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const AdminStudents = () => {
 
   useEffect(() => {
     dispatch(fetchAllEnrollments());
-    dispatch(fetchCourses());
+    dispatch(fetchCourses({}));
   }, [dispatch]);
 
   const filteredEnrollments = enrollments.filter((enrollment) => {
@@ -50,11 +51,7 @@ const AdminStudents = () => {
       : 0;
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -206,12 +203,13 @@ const AdminStudents = () => {
                           <div className='flex items-center space-x-2'>
                             <div className='w-24 bg-gray-200 rounded-full h-2'>
                               <div
-                                className={`h-2 rounded-full ${enrollment.progress === 100
+                                className={`h-2 rounded-full ${
+                                  enrollment.progress === 100
                                     ? 'bg-green-600'
                                     : enrollment.progress > 0
-                                      ? 'bg-blue-600'
-                                      : 'bg-gray-300'
-                                  }`}
+                                    ? 'bg-blue-600'
+                                    : 'bg-gray-300'
+                                }`}
                                 style={{ width: `${enrollment.progress}%` }}
                               />
                             </div>

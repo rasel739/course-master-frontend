@@ -2,16 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import {
-  ArrowLeft,
-  Edit,
-  Plus,
-  Trash2,
-  ChevronDown,
-  ChevronRight,
-  Loader2,
-  Play,
-} from 'lucide-react';
+import { ArrowLeft, Edit, Plus, Trash2, ChevronDown, ChevronRight, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
@@ -21,6 +12,7 @@ import { formatPrice } from '@/utils';
 import ModuleDialog from '@/components/admin/module-dialog';
 import LessonDialog from '@/components/admin/lesson-dialog';
 import { Module, Lesson } from '@/types';
+import Loading from '@/app/loading';
 
 const AdminCourseDetails = () => {
   const params = useParams();
@@ -89,11 +81,7 @@ const AdminCourseDetails = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!course) {

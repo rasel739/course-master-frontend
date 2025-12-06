@@ -37,7 +37,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [dispatch, isAuthenticated, isLoading]);
 
-
   useEffect(() => {
     const token = Cookies.get('accessToken');
     if (!token && !isLoading) {
@@ -45,11 +44,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [isLoading, router]);
 
-
   if (isLoading || !user) {
     return null;
   }
-
 
   if (user.role !== 'admin') {
     router.push('/dashboard');
@@ -76,13 +73,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className='min-h-screen bg-gray-50'>
-      {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-linear-to-b from-blue-600 to-purple-700 text-white transform transition-transform duration-200 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-linear-to-b from-blue-600 to-purple-700 text-white transform transition-transform duration-200 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
       >
         <div className='flex flex-col h-full'>
-          {/* Logo */}
           <div className='flex items-center justify-between h-16 px-6 border-b border-white/10'>
             <Link href='/admin' className='flex items-center space-x-2'>
               <div className='w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center'>
@@ -98,7 +94,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
           </div>
 
-          {/* Navigation */}
           <nav className='flex-1 px-4 py-6 space-y-2 overflow-y-auto'>
             {navigation.map((item) => (
               <Link
@@ -112,7 +107,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             ))}
           </nav>
 
-          {/* User Profile */}
           {user && (
             <div className='p-4 border-t border-white/10'>
               <div className='flex items-center space-x-3 mb-3'>
@@ -137,9 +131,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className='lg:pl-64'>
-        {/* Mobile Header */}
         <header className='lg:hidden sticky top-0 z-40 bg-white border-b border-gray-200'>
           <div className='flex items-center justify-between h-16 px-4'>
             <button
@@ -158,11 +150,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        {/* Page Content */}
         <main className='min-h-screen p-6'>{children}</main>
       </div>
 
-      {/* Sidebar Overlay */}
       {sidebarOpen && (
         <div
           className='fixed inset-0 bg-black/50 z-40 lg:hidden'

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, FileText, Users, CheckCircle, Clock, Eye, Loader2 } from 'lucide-react';
+import { Plus, Search, FileText, Users, CheckCircle, Clock, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { formatDate } from '@/utils';
 import AssignmentDialog from '@/components/admin/assignment-dialog';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchAssignments } from '@/redux/features/adminSlice';
+import Loading from '@/app/loading';
 
 export default function AdminAssignmentsPage() {
   const router = useRouter();
@@ -39,11 +40,7 @@ export default function AdminAssignmentsPage() {
   const pendingGrading = totalSubmissions - gradedSubmissions;
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center h-96'>
-        <Loader2 className='w-8 h-8 animate-spin text-blue-600' />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -159,9 +156,8 @@ export default function AdminAssignmentsPage() {
                   </tr>
                 ) : (
                   filteredAssignments.map((assignment) => {
-                    const graded = assignment.submissions?.filter(
-                      (s) => s.grade !== undefined
-                    ).length || 0;
+                    const graded =
+                      assignment.submissions?.filter((s) => s.grade !== undefined).length || 0;
                     const pending = (assignment.submissions?.length || 0) - graded;
                     const courseTitle =
                       typeof assignment.course === 'object'
