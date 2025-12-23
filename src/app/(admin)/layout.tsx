@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import Link from 'next/link';
@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -22,35 +23,53 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCurrentUser, logoutUser } from '@/redux/features/authSlice';
 import { toggleSidebar } from '@/redux/features/uiSlice';
 import { getInitials } from '@/utils';
+import Loading from '../loading';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { sidebarOpen } = useAppSelector((state) => state.ui);
+  const [isInitializing, setIsInitializing] = useState(true);
 
+  // Check authentication status on mount
   useEffect(() => {
     const token = Cookies.get('accessToken');
-
-    if (token && !isAuthenticated && !isLoading) {
-      dispatch(fetchCurrentUser());
+    if (!token) {
+      router.replace('/login');
+      return;
     }
-  }, [dispatch, isAuthenticated, isLoading]);
 
+    // Fetch user data if authenticated but no user data
+    if (!user) {
+      dispatch(fetchCurrentUser()).finally(() => {
+        setIsInitializing(false);
+      });
+    } else {
+      setIsInitializing(false);
+    }
+  }, [dispatch, router, user]);
+
+  // Redirect non-admin users to dashboard
   useEffect(() => {
-    const token = Cookies.get('accessToken');
-    if (!token && !isLoading) {
-      router.push('/login');
+    if (!isInitializing && user && user.role !== 'admin') {
+      router.replace('/dashboard');
     }
-  }, [isLoading, router]);
+  }, [user, isInitializing, router]);
 
-  if (isLoading || !user) {
-    return null;
+  // Show loading while initializing
+  if (isInitializing || isLoading) {
+    return <Loading />;
   }
 
+  // Don't render if user is not authenticated
+  if (!user) {
+    return <Loading />;
+  }
+
+  // Don't render admin panel for non-admin users (redirect in progress)
   if (user.role !== 'admin') {
-    router.push('/dashboard');
-    return null;
+    return <Loading />;
   }
 
   const handleLogout = async () => {
@@ -66,6 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Courses', href: '/admin/course', icon: BookOpen },
     { name: 'Students', href: '/admin/students', icon: Users },
+    { name: 'Chat', href: '/admin/chat', icon: MessageSquare },
     { name: 'Assignments', href: '/admin/assignments', icon: FileText },
     { name: 'Quizzes', href: '/admin/quizzes', icon: ClipboardList },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
@@ -74,9 +94,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className='min-h-screen bg-gray-50'>
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-linear-to-b from-blue-600 to-purple-700 text-white transform transition-transform duration-200 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-linear-to-b from-blue-600 to-purple-700 text-white transform transition-transform duration-200 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
       >
         <div className='flex flex-col h-full'>
           <div className='flex items-center justify-between h-16 px-6 border-b border-white/10'>
@@ -150,7 +169,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <main className='min-h-screen p-6'>{children}</main>
+        <main className='min-h-screen p-3 sm:p-4 lg:p-6'>{children}</main>
       </div>
 
       {sidebarOpen && (

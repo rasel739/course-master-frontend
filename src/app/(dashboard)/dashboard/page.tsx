@@ -16,12 +16,14 @@ import Image from 'next/image';
 const Dashboard = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const { enrollments, isLoading } = useAppSelector((state) => state.enrollment);
 
   useEffect(() => {
-    dispatch(fetchDashboard());
-  }, [dispatch]);
+    if (user && isAuthenticated) {
+      dispatch(fetchDashboard());
+    }
+  }, [dispatch, user, isAuthenticated]);
 
   const stats = [
     {
@@ -47,7 +49,7 @@ const Dashboard = () => {
       value:
         enrollments?.length > 0
           ? Math.round(enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length) +
-            '%'
+          '%'
           : '0%',
       icon: Clock,
       color: 'bg-orange-100 text-orange-600',

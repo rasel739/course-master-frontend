@@ -4,6 +4,10 @@ import '../styles/globals.css';
 
 import { Toaster } from 'react-hot-toast';
 import { ReduxProvider } from '@/lib/Providers';
+import { SocketProvider } from '@/lib/socket';
+import { CallProvider } from '@/lib/callContext';
+import VideoCallModal from '@/components/chat/VideoCallModal';
+import IncomingCallModal from '@/components/chat/IncomingCallModal';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,7 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en'>
       <body className={inter.className}>
         <ReduxProvider>
-          {children}
+          <SocketProvider>
+            <CallProvider>
+              {children}
+              <VideoCallModal />
+              <IncomingCallModal />
+            </CallProvider>
+          </SocketProvider>
           <Toaster
             position='top-right'
             toastOptions={{
@@ -45,3 +55,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

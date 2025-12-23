@@ -68,6 +68,8 @@ export interface Course {
   };
   totalEnrollments: number;
   isPublished: boolean;
+  averageRating?: number;
+  totalReviews?: number;
   totalLessons?: number;
   totalDuration?: number;
   createdAt: string;
@@ -294,3 +296,104 @@ export interface AllEnrollmentsResponse {
   enrollments: Enrollment[];
   pagination: AllEnrollmentsPagination;
 }
+
+export interface Payment {
+  _id: string;
+  user: string;
+  courses: string[] | Course[];
+  stripePaymentIntentId: string;
+  stripeCustomerId?: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'succeeded' | 'failed' | 'refunded';
+  paymentMethod?: string;
+  receiptUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaymentIntentResponse {
+  clientSecret: string;
+  paymentIntentId: string;
+  amount: number;
+  currency: string;
+}
+
+// Chat Types
+export interface ChatParticipant {
+  _id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: UserRole;
+}
+
+export interface ChatMessage {
+  _id: string;
+  conversation: string;
+  sender: {
+    _id: string;
+    name: string;
+    avatar?: string;
+  };
+  content: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatConversation {
+  _id: string;
+  participants: ChatParticipant[];
+  course?: {
+    _id: string;
+    title: string;
+  };
+  lastMessage?: {
+    _id: string;
+    content: string;
+    sender: string;
+    createdAt: string;
+  };
+  lastMessageAt?: string;
+  unreadCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateConversationRequest {
+  participantId: string;
+  courseId?: string;
+  initialMessage?: string;
+}
+
+export interface SendMessageRequest {
+  content: string;
+}
+
+export interface Instructor {
+  _id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+export interface Student {
+  _id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+export interface ChatMessagesPagination {
+  currentPage: number;
+  totalPages: number;
+  totalMessages: number;
+}
+
+export interface ChatMessagesResponse {
+  messages: ChatMessage[];
+  pagination: ChatMessagesPagination;
+}
+
+

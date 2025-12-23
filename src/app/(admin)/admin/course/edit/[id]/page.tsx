@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,7 +42,7 @@ const EditCourse = () => {
     formState: { errors },
     reset,
   } = useForm<EditCourseData>({
-    resolver: yupResolver(editCourseSchema),
+    resolver: yupResolver(editCourseSchema) as Resolver<EditCourseData>,
   });
 
   useEffect(() => {

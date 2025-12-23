@@ -1,34 +1,80 @@
 'use client';
-import Cookies from 'js-cookie';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
-import { GraduationCap, Home, BookOpen, BarChart3, LogOut, Menu, X } from 'lucide-react';
+import { GraduationCap, Home, BookOpen, BarChart3, LogOut, Menu, X, MessageSquare, Award, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCurrentUser, logoutUser } from '@/redux/features/authSlice';
+import { fetchUnreadCount } from '@/redux/features/chatSlice';
 import { toggleSidebar } from '@/redux/features/uiSlice';
 import { getInitials } from '@/utils';
+import Loading from '../loading';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { sidebarOpen } = useAppSelector((state) => state.ui);
+  const { unreadCount } = useAppSelector((state) => state.chat);
+  const [isInitializing, setIsInitializing] = useState(true);
 
+  // Check authentication status on mount
   useEffect(() => {
     const token = Cookies.get('accessToken');
-
-    if (token && !isAuthenticated && !isLoading) {
-      dispatch(fetchCurrentUser());
+    if (!token) {
+      router.replace('/login');
+      return;
     }
-  }, [dispatch, isAuthenticated, isLoading]);
 
+    // Fetch user data if authenticated but no user data
+    if (!user) {
+      dispatch(fetchCurrentUser()).finally(() => {
+        setIsInitializing(false);
+      });
+    } else {
+      setIsInitializing(false);
+    }
+  }, [dispatch, router, user]);
+
+  // Redirect admin users to admin panel
   useEffect(() => {
-    if (isAuthenticated && user?.role === 'admin') {
+    if (!isInitializing && user && user.role === 'admin') {
       router.replace('/admin');
     }
-  }, [user, isAuthenticated, router]);
+  }, [user, isInitializing, router]);
+
+  // Fetch additional data when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user && !isLoading) {
+      dispatch(fetchUnreadCount());
+    }
+  }, [dispatch, isAuthenticated, user, isLoading]);
+
+  // Poll for unread count every 30 seconds
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    const interval = setInterval(() => {
+      dispatch(fetchUnreadCount());
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [dispatch, isAuthenticated, user]);
+
+  // Show loading while initializing or checking auth
+  if (isInitializing || isLoading) {
+    return <Loading />;
+  }
+
+  // Don't render if user is not authenticated
+  if (!user) {
+    return <Loading />;
+  }
+
+  // Don't render dashboard for admin users (redirect in progress)
+  if (user.role === 'admin') {
+    return <Loading />;
+  }
 
   const handleLogout = async () => {
     try {
@@ -41,17 +87,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Course', href: '/courses', icon: BookOpen },
+    { name: 'Courses', href: '/courses', icon: BookOpen },
     { name: 'My Enrollments', href: '/enrollment', icon: BarChart3 },
+    { name: 'Certificates', href: '/certificates', icon: Award },
+    { name: 'Chat', href: '/chat', icon: MessageSquare, badge: unreadCount > 0 ? unreadCount : undefined },
+    { name: 'Profile', href: '/profile', icon: User },
   ];
 
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0`}
       >
         <div className='flex flex-col h-full'>
           {/* Logo */}
@@ -76,10 +124,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.name}
                 href={item.href}
-                className='flex items-center space-x-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors'
+                className='flex items-center justify-between px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors'
               >
-                <item.icon className='w-5 h-5' />
-                <span className='font-medium'>{item.name}</span>
+                <div className='flex items-center space-x-3'>
+                  <item.icon className='w-5 h-5' />
+                  <span className='font-medium'>{item.name}</span>
+                </div>
+                {item.badge && (
+                  <span className='flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-bold text-white bg-indigo-600 rounded-full'>
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
@@ -127,7 +182,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Page Content */}
-        <main className='min-h-screen p-6'>{children}</main>
+        <main className='min-h-screen p-3 sm:p-4 lg:p-6'>{children}</main>
       </div>
 
       {/* Sidebar Overlay */}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, Plus, Trash2, ChevronDown, ChevronRight, Play } from 'lucide-react';
+import { ArrowLeft, Edit, Plus, Trash2, ChevronDown, ChevronRight, Play, FileText, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
@@ -11,8 +11,9 @@ import { setSelectedCourse, deleteModule, deleteLesson } from '@/redux/features/
 import { formatPrice } from '@/utils';
 import ModuleDialog from '@/components/admin/module-dialog';
 import LessonDialog from '@/components/admin/lesson-dialog';
-import { Module, Lesson } from '@/types';
+import { Module, Lesson, Assignment, Quiz } from '@/types';
 import Loading from '@/app/loading';
+import { adminApi } from '@/helpers/axios/api';
 
 const AdminCourseDetails = () => {
   const params = useParams();
@@ -26,6 +27,11 @@ const AdminCourseDetails = () => {
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
 
+  // Assignments and quizzes state
+  const [courseAssignments, setCourseAssignments] = useState<Assignment[]>([]);
+  const [courseQuizzes, setCourseQuizzes] = useState<Quiz[]>([]);
+  const [loadingExtras, setLoadingExtras] = useState(false);
+
   useEffect(() => {
     if (params.id) {
       dispatch(fetchCourseById(params.id as string));
@@ -35,8 +41,26 @@ const AdminCourseDetails = () => {
   useEffect(() => {
     if (course) {
       dispatch(setSelectedCourse(course));
+      // Fetch assignments and quizzes for this course
+      fetchCourseExtras(course._id);
     }
   }, [course, dispatch]);
+
+  const fetchCourseExtras = async (courseId: string) => {
+    setLoadingExtras(true);
+    try {
+      const [assignmentsRes, quizzesRes] = await Promise.all([
+        adminApi.getAssignmentsByCourse(courseId),
+        adminApi.getQuizzesByCourse(courseId),
+      ]);
+      setCourseAssignments(assignmentsRes.data.data || []);
+      setCourseQuizzes(quizzesRes.data.data || []);
+    } catch (error) {
+      console.error('Error fetching course extras:', error);
+    } finally {
+      setLoadingExtras(false);
+    }
+  };
 
   const toggleModule = (moduleId: string) => {
     setExpandedModules((prev) =>
@@ -78,6 +102,15 @@ const AdminCourseDetails = () => {
     setSelectedModuleId(moduleId);
     setEditingLesson(lesson);
     setLessonDialogOpen(true);
+  };
+
+  // Get assignments and quizzes for a specific module
+  const getModuleAssignments = (moduleId: string) => {
+    return courseAssignments.filter((a) => a.module === moduleId);
+  };
+
+  const getModuleQuizzes = (moduleId: string) => {
+    return courseQuizzes.filter((q) => q.module === moduleId);
   };
 
   if (isLoading) {
@@ -170,100 +203,192 @@ const AdminCourseDetails = () => {
               {course?.modules
                 ?.map((module) => ({ ...module }))
                 .sort((a, b) => a.order - b.order)
-                .map((module) => (
-                  <div key={module._id} className='border border-gray-200 rounded-lg'>
-                    <div className='flex items-center justify-between p-4 hover:bg-gray-50'>
-                      <button
-                        onClick={() => toggleModule(module._id)}
-                        className='flex items-center space-x-3 flex-1'
-                      >
-                        {expandedModules.includes(module._id) ? (
-                          <ChevronDown className='w-5 h-5 text-gray-600' />
-                        ) : (
-                          <ChevronRight className='w-5 h-5 text-gray-600' />
-                        )}
-                        <div className='text-left'>
-                          <h3 className='font-semibold text-gray-900'>{module.title}</h3>
-                          {module.description && (
-                            <p className='text-sm text-gray-600 mt-1'>{module.description}</p>
-                          )}
-                          <p className='text-xs text-gray-500 mt-1'>
-                            {module.lessons.length} lessons • Order: {module.order}
-                          </p>
-                        </div>
-                      </button>
-                      <div className='flex items-center space-x-2'>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          onClick={() => openAddLessonDialog(module._id)}
-                        >
-                          <Plus className='w-4 h-4' />
-                        </Button>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          onClick={() => openEditModuleDialog(module)}
-                        >
-                          <Edit className='w-4 h-4' />
-                        </Button>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          onClick={() => handleDeleteModule(module._id)}
-                        >
-                          <Trash2 className='w-4 h-4 text-red-600' />
-                        </Button>
-                      </div>
-                    </div>
+                .map((module) => {
+                  const moduleAssignments = getModuleAssignments(module._id);
+                  const moduleQuizzes = getModuleQuizzes(module._id);
 
-                    {expandedModules.includes(module._id) && (
-                      <div className='border-t border-gray-200 bg-gray-50'>
-                        {module.lessons.length === 0 ? (
-                          <div className='p-4 text-center text-gray-500 text-sm'>
-                            No lessons yet. Add your first lesson.
+                  return (
+                    <div key={module._id} className='border border-gray-200 rounded-lg'>
+                      <div className='flex items-center justify-between p-4 hover:bg-gray-50'>
+                        <button
+                          onClick={() => toggleModule(module._id)}
+                          className='flex items-center space-x-3 flex-1'
+                        >
+                          {expandedModules.includes(module._id) ? (
+                            <ChevronDown className='w-5 h-5 text-gray-600' />
+                          ) : (
+                            <ChevronRight className='w-5 h-5 text-gray-600' />
+                          )}
+                          <div className='text-left'>
+                            <h3 className='font-semibold text-gray-900'>{module.title}</h3>
+                            {module.description && (
+                              <p className='text-sm text-gray-600 mt-1'>{module.description}</p>
+                            )}
+                            <p className='text-xs text-gray-500 mt-1'>
+                              {module.lessons.length} lessons • {moduleAssignments.length} assignments • {moduleQuizzes.length} quizzes
+                            </p>
                           </div>
-                        ) : (
-                          module?.lessons
-                            ?.map((lesson) => ({ ...lesson }))
-                            .sort((a, b) => a.order - b.order)
-                            .map((lesson) => (
-                              <div
-                                key={lesson._id}
-                                className='flex items-center justify-between p-4 hover:bg-gray-100'
+                        </button>
+                        <div className='flex items-center space-x-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => openAddLessonDialog(module._id)}
+                          >
+                            <Plus className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => openEditModuleDialog(module)}
+                          >
+                            <Edit className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDeleteModule(module._id)}
+                          >
+                            <Trash2 className='w-4 h-4 text-red-600' />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {expandedModules.includes(module._id) && (
+                        <div className='border-t border-gray-200 bg-gray-50'>
+                          {/* Lessons Section */}
+                          <div className='p-3 border-b border-gray-200'>
+                            <h4 className='text-sm font-medium text-gray-700 mb-2 flex items-center'>
+                              <Play className='w-4 h-4 mr-2' />
+                              Lessons
+                            </h4>
+                            {module.lessons.length === 0 ? (
+                              <p className='text-sm text-gray-500 pl-6'>No lessons yet.</p>
+                            ) : (
+                              module?.lessons
+                                ?.map((lesson) => ({ ...lesson }))
+                                .sort((a, b) => a.order - b.order)
+                                .map((lesson) => (
+                                  <div
+                                    key={lesson._id}
+                                    className='flex items-center justify-between p-2 ml-6 hover:bg-gray-100 rounded'
+                                  >
+                                    <div className='flex items-center space-x-3'>
+                                      <Play className='w-4 h-4 text-gray-400' />
+                                      <div>
+                                        <p className='font-medium text-gray-900'>{lesson.title}</p>
+                                        <p className='text-xs text-gray-500'>
+                                          {lesson.duration} min • Order: {lesson.order}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className='flex items-center space-x-2'>
+                                      <Button
+                                        variant='ghost'
+                                        size='sm'
+                                        onClick={() => openEditLessonDialog(module._id, lesson)}
+                                      >
+                                        <Edit className='w-4 h-4' />
+                                      </Button>
+                                      <Button
+                                        variant='ghost'
+                                        size='sm'
+                                        onClick={() => handleDeleteLesson(module._id, lesson._id)}
+                                      >
+                                        <Trash2 className='w-4 h-4 text-red-600' />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))
+                            )}
+                          </div>
+
+                          {/* Assignments Section */}
+                          <div className='p-3 border-b border-gray-200'>
+                            <div className='flex items-center justify-between mb-2'>
+                              <h4 className='text-sm font-medium text-gray-700 flex items-center'>
+                                <FileText className='w-4 h-4 mr-2' />
+                                Assignments
+                              </h4>
+                              <Button
+                                variant='ghost'
+                                size='sm'
+                                onClick={() => router.push(`/admin/assignments?courseId=${course._id}&moduleId=${module._id}`)}
                               >
-                                <div className='flex items-center space-x-3'>
-                                  <Play className='w-4 h-4 text-gray-400' />
-                                  <div>
-                                    <p className='font-medium text-gray-900'>{lesson.title}</p>
-                                    <p className='text-xs text-gray-500'>
-                                      {lesson.duration} min • Order: {lesson.order}
-                                    </p>
+                                <Plus className='w-3 h-3 mr-1' />
+                                Add
+                              </Button>
+                            </div>
+                            {loadingExtras ? (
+                              <p className='text-sm text-gray-500 pl-6'>Loading...</p>
+                            ) : moduleAssignments.length === 0 ? (
+                              <p className='text-sm text-gray-500 pl-6'>No assignments yet.</p>
+                            ) : (
+                              moduleAssignments.map((assignment) => (
+                                <div
+                                  key={assignment._id}
+                                  className='flex items-center justify-between p-2 ml-6 hover:bg-gray-100 rounded cursor-pointer'
+                                  onClick={() => router.push(`/admin/assignments/${assignment._id}`)}
+                                >
+                                  <div className='flex items-center space-x-3'>
+                                    <FileText className='w-4 h-4 text-blue-500' />
+                                    <div>
+                                      <p className='font-medium text-gray-900'>{assignment.title}</p>
+                                      <p className='text-xs text-gray-500'>
+                                        {assignment.submissions?.length || 0} submissions
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
-                                <div className='flex items-center space-x-2'>
-                                  <Button
-                                    variant='ghost'
-                                    size='sm'
-                                    onClick={() => openEditLessonDialog(module._id, lesson)}
-                                  >
-                                    <Edit className='w-4 h-4' />
-                                  </Button>
-                                  <Button
-                                    variant='ghost'
-                                    size='sm'
-                                    onClick={() => handleDeleteLesson(module._id, lesson._id)}
-                                  >
-                                    <Trash2 className='w-4 h-4 text-red-600' />
-                                  </Button>
+                              ))
+                            )}
+                          </div>
+
+                          {/* Quizzes Section */}
+                          <div className='p-3'>
+                            <div className='flex items-center justify-between mb-2'>
+                              <h4 className='text-sm font-medium text-gray-700 flex items-center'>
+                                <HelpCircle className='w-4 h-4 mr-2' />
+                                Quizzes
+                              </h4>
+                              <Button
+                                variant='ghost'
+                                size='sm'
+                                onClick={() => router.push(`/admin/quizzes?courseId=${course._id}&moduleId=${module._id}`)}
+                              >
+                                <Plus className='w-3 h-3 mr-1' />
+                                Add
+                              </Button>
+                            </div>
+                            {loadingExtras ? (
+                              <p className='text-sm text-gray-500 pl-6'>Loading...</p>
+                            ) : moduleQuizzes.length === 0 ? (
+                              <p className='text-sm text-gray-500 pl-6'>No quizzes yet.</p>
+                            ) : (
+                              moduleQuizzes.map((quiz) => (
+                                <div
+                                  key={quiz._id}
+                                  className='flex items-center justify-between p-2 ml-6 hover:bg-gray-100 rounded cursor-pointer'
+                                  onClick={() => router.push(`/admin/quizzes/${quiz._id}`)}
+                                >
+                                  <div className='flex items-center space-x-3'>
+                                    <HelpCircle className='w-4 h-4 text-purple-500' />
+                                    <div>
+                                      <p className='font-medium text-gray-900'>{quiz.title}</p>
+                                      <p className='text-xs text-gray-500'>
+                                        {quiz.questions?.length || 0} questions • {quiz.attempts?.length || 0} attempts
+                                      </p>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                            ))
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
             </div>
           )}
         </CardContent>

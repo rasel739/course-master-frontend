@@ -23,7 +23,16 @@ import {
   AssignmentsResponse,
   QuizzesResponse,
   AllEnrollmentsResponse,
+  Payment,
+  ChatConversation,
+  ChatMessagesResponse,
+  ChatMessage,
+  CreateConversationRequest,
+  SendMessageRequest,
+  Instructor,
+  Student,
 } from '@/types';
+
 
 export const authApi = {
   register: (data: IRegister) =>
@@ -74,6 +83,15 @@ export const studentApi = {
     axiosInstance.post<ApiResponse<SubmitQuizResponse>>(`/students/quizzes/${quizId}/submit`, {
       answers,
     }),
+
+  getAssignmentsByCourse: (courseId: string) =>
+    axiosInstance.get<ApiResponse<Assignment[]>>(`/students/courses/${courseId}/assignments`),
+
+  getQuizzesByCourse: (courseId: string) =>
+    axiosInstance.get<ApiResponse<Quiz[]>>(`/students/courses/${courseId}/quizzes`),
+
+  getQuizById: (quizId: string) =>
+    axiosInstance.get<ApiResponse<{ _id: string; title: string; questions: { question: string; options: string[] }[] }>>(`/students/quizzes/${quizId}`),
 };
 
 export const adminApi = {
@@ -168,4 +186,130 @@ export const adminApi = {
 
   getAllEnrollments: (params?: { page?: number; limit?: number }) =>
     axiosInstance.get<ApiResponse<AllEnrollmentsResponse>>('/admin/enrollments', { params }),
+
+  getAssignmentsByCourse: (courseId: string) =>
+    axiosInstance.get<ApiResponse<Assignment[]>>(`/admin/courses/${courseId}/assignments`),
+
+  getQuizzesByCourse: (courseId: string) =>
+    axiosInstance.get<ApiResponse<Quiz[]>>(`/admin/courses/${courseId}/quizzes`),
+};
+
+export const paymentApi = {
+  createPaymentIntent: (courseIds: string[]) =>
+    axiosInstance.post<ApiResponse<{ clientSecret: string; paymentIntentId: string; amount: number; currency: string }>>('/payment/create-payment-intent', { courseIds }),
+
+  getPaymentHistory: () =>
+    axiosInstance.get<ApiResponse<Payment[]>>('/payment/history'),
+
+  verifyPaymentStatus: (paymentIntentId: string) =>
+    axiosInstance.get<ApiResponse<{ status: string; enrolled: boolean }>>(`/payment/verify/${paymentIntentId}`),
+};
+
+export const chatApi = {
+  getInstructors: () =>
+    axiosInstance.get<ApiResponse<Instructor[]>>('/chat/instructors'),
+
+  getStudents: () =>
+    axiosInstance.get<ApiResponse<Student[]>>('/chat/students'),
+
+  getUnreadCount: () =>
+    axiosInstance.get<ApiResponse<{ unreadCount: number }>>('/chat/unread-count'),
+
+  createConversation: (data: CreateConversationRequest) =>
+    axiosInstance.post<ApiResponse<ChatConversation>>('/chat/conversations', data),
+
+  getConversations: () =>
+    axiosInstance.get<ApiResponse<ChatConversation[]>>('/chat/conversations'),
+
+  getConversationById: (conversationId: string) =>
+    axiosInstance.get<ApiResponse<ChatConversation>>(`/chat/conversations/${conversationId}`),
+
+  getMessages: (conversationId: string, params?: { page?: number; limit?: number }) =>
+    axiosInstance.get<ApiResponse<ChatMessagesResponse>>(
+      `/chat/conversations/${conversationId}/messages`,
+      { params }
+    ),
+
+  sendMessage: (conversationId: string, data: SendMessageRequest) =>
+    axiosInstance.post<ApiResponse<ChatMessage>>(
+      `/chat/conversations/${conversationId}/messages`,
+      data
+    ),
+
+  markConversationAsRead: (conversationId: string) =>
+    axiosInstance.put<ApiResponse>(`/chat/conversations/${conversationId}/read`),
+
+  markMessageAsRead: (messageId: string) =>
+    axiosInstance.put<ApiResponse>(`/chat/messages/${messageId}/read`),
+};
+
+// Review API
+export const reviewApi = {
+  getCourseReviews: (courseId: string, params?: { page?: number; limit?: number }) =>
+    axiosInstance.get<ApiResponse<{
+      reviews: {
+        _id: string;
+        user: { _id: string; name: string; avatar?: string };
+        rating: number;
+        content: string;
+        helpful: number;
+        notHelpful: number;
+        createdAt: string;
+      }[];
+      pagination: { currentPage: number; totalPages: number; totalReviews: number };
+      averageRating: number;
+      ratingBreakdown: { stars: number; count: number }[];
+    }>>(`/reviews/courses/${courseId}`, { params }),
+
+  submitReview: (courseId: string, data: { rating: number; content: string }) =>
+    axiosInstance.post<ApiResponse<{ _id: string }>>(`/reviews/courses/${courseId}`, data),
+
+  voteReview: (reviewId: string, voteType: 'helpful' | 'notHelpful') =>
+    axiosInstance.put<ApiResponse>(`/reviews/${reviewId}/vote`, { voteType }),
+
+  deleteReview: (reviewId: string) =>
+    axiosInstance.delete<ApiResponse>(`/reviews/${reviewId}`),
+};
+
+// Certificate API
+export const certificateApi = {
+  getUserCertificates: () =>
+    axiosInstance.get<ApiResponse<{
+      _id: string;
+      course: { _id: string; title: string; thumbnail?: string; category: string };
+      certificateNumber: string;
+      issuedAt: string;
+      courseTitleAtIssue: string;
+      studentNameAtIssue: string;
+    }[]>>('/certificates'),
+
+  getCertificateById: (certificateId: string) =>
+    axiosInstance.get<ApiResponse<{
+      _id: string;
+      user: { _id: string; name: string; email: string };
+      course: { _id: string; title: string; category: string; instructor: string };
+      certificateNumber: string;
+      issuedAt: string;
+      courseTitleAtIssue: string;
+      studentNameAtIssue: string;
+    }>>(`/certificates/${certificateId}`),
+
+  verifyCertificate: (certificateNumber: string) =>
+    axiosInstance.get<ApiResponse<{
+      valid: boolean;
+      certificate?: {
+        _id: string;
+        user: { name: string };
+        course: { title: string };
+        certificateNumber: string;
+        issuedAt: string;
+      };
+    }>>(`/certificates/verify/${certificateNumber}`),
+
+  generateCertificate: (enrollmentId: string) =>
+    axiosInstance.post<ApiResponse<{
+      _id: string;
+      certificateNumber: string;
+      issuedAt: string;
+    }>>(`/certificates/generate/${enrollmentId}`),
 };

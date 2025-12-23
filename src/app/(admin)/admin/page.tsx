@@ -13,10 +13,13 @@ const AdminDashboard = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { analytics, isLoading } = useAppSelector((state) => state.admin);
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchAnalytics(undefined));
-  }, [dispatch]);
+    if (user && isAuthenticated) {
+      dispatch(fetchAnalytics(undefined));
+    }
+  }, [dispatch, user, isAuthenticated]);
 
   if (isLoading) {
     return <Loading />;

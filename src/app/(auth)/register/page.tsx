@@ -18,7 +18,7 @@ import { registerSchema } from '@/schema';
 const Register = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isLoading, isAuthenticated, error } = useAppSelector((state) => state.auth);
+  const { isLoading, isAuthenticated, error, user } = useAppSelector((state) => state.auth);
 
   const {
     register,
@@ -29,10 +29,15 @@ const Register = () => {
   });
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
+    if (isAuthenticated && user) {
+      // Role-based redirection
+      if (user.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   useEffect(() => {
     return () => {
