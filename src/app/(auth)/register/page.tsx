@@ -30,11 +30,10 @@ const Register = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Role-based redirection
       if (user.role === 'admin') {
         router.push('/admin');
       } else {
-        router.push('/dashboard');
+        router.push('/student');
       }
     }
   }, [isAuthenticated, user, router]);

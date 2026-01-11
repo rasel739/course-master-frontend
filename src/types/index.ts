@@ -28,13 +28,18 @@ export interface AuthResponse {
   refreshToken?: string;
 }
 
-export type CourseCategory =
-  | 'Web Development'
-  | 'Mobile Development'
-  | 'Data Science'
-  | 'AI/ML'
-  | 'DevOps'
-  | 'Other';
+export type CourseCategory = string;
+
+export interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Lesson {
   _id: string;
@@ -319,7 +324,6 @@ export interface PaymentIntentResponse {
   currency: string;
 }
 
-// Chat Types
 export interface ChatParticipant {
   _id: string;
   name: string;

@@ -24,7 +24,6 @@ interface UseWebRTCReturn {
     cleanup: () => void;
 }
 
-// STUN servers for NAT traversal
 const ICE_SERVERS: RTCConfiguration = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -46,7 +45,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
 
-    // Create peer connection
     const createPeerConnection = useCallback(() => {
         if (peerConnectionRef.current) return peerConnectionRef.current;
 
@@ -78,7 +76,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         return pc;
     }, [onIceCandidate, onRemoteStream, onConnectionStateChange]);
 
-    // Initialize media (camera/microphone)
     const initializeMedia = useCallback(async (video: boolean): Promise<MediaStream | null> => {
         try {
             const constraints: MediaStreamConstraints = {
@@ -92,7 +89,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
             setIsAudioEnabled(true);
             setIsVideoEnabled(video);
 
-            // Add tracks to peer connection
             const pc = createPeerConnection();
             stream.getTracks().forEach((track) => {
                 pc.addTrack(track, stream);
@@ -105,7 +101,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         }
     }, [createPeerConnection]);
 
-    // Create SDP offer
     const createOffer = useCallback(async (): Promise<RTCSessionDescriptionInit | null> => {
         try {
             const pc = peerConnectionRef.current;
@@ -120,7 +115,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         }
     }, []);
 
-    // Create SDP answer
     const createAnswer = useCallback(async (offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit | null> => {
         try {
             const pc = createPeerConnection();
@@ -134,7 +128,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         }
     }, [createPeerConnection]);
 
-    // Set remote description (for handling offer/answer)
     const setRemoteDescription = useCallback(async (description: RTCSessionDescriptionInit): Promise<void> => {
         try {
             const pc = peerConnectionRef.current;
@@ -145,7 +138,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         }
     }, []);
 
-    // Add ICE candidate
     const addIceCandidate = useCallback(async (candidate: RTCIceCandidateInit): Promise<void> => {
         try {
             const pc = peerConnectionRef.current;
@@ -156,7 +148,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         }
     }, []);
 
-    // Toggle audio
     const toggleAudio = useCallback(() => {
         const stream = localStreamRef.current;
         if (!stream) return;
@@ -167,7 +158,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         setIsAudioEnabled((prev) => !prev);
     }, []);
 
-    // Toggle video
     const toggleVideo = useCallback(() => {
         const stream = localStreamRef.current;
         if (!stream) return;
@@ -178,9 +168,7 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         setIsVideoEnabled((prev) => !prev);
     }, []);
 
-    // Cleanup
     const cleanup = useCallback(() => {
-        // Stop all tracks
         if (localStreamRef.current) {
             localStreamRef.current.getTracks().forEach((track) => track.stop());
             localStreamRef.current = null;
@@ -193,7 +181,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
             setRemoteStream(null);
         }
 
-        // Close peer connection
         if (peerConnectionRef.current) {
             peerConnectionRef.current.close();
             peerConnectionRef.current = null;
@@ -202,7 +189,6 @@ export function useWebRTC(options: UseWebRTCOptions = {}): UseWebRTCReturn {
         setConnectionState(null);
     }, []);
 
-    // Cleanup on unmount
     useEffect(() => {
         return () => {
             cleanup();

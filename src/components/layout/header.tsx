@@ -14,12 +14,12 @@ const Header = () => {
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className='border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50'>
+    <header className='border-b bg-white/80  sticky top-0 z-50'>
       <div className='container mx-auto px-4'>
         <div className='flex items-center justify-between h-16'>
           {/* Logo */}
           <Link href='/' className='flex items-center space-x-2'>
-            <div className='w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center'>
+            <div className='w-8 h-8 bg-linear-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center'>
               <GraduationCap className='w-5 h-5 text-white' />
             </div>
             <span className='text-lg sm:text-xl font-bold'>Course Master</span>
@@ -27,18 +27,24 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className='hidden md:flex items-center space-x-6'>
+            <Link href='/' className='text-gray-600 hover:text-gray-900 transition-colors'>
+              Home
+            </Link>
             <Link href='/courses' className='text-gray-600 hover:text-gray-900 transition-colors'>
               Courses
             </Link>
             <Link href='/about' className='text-gray-600 hover:text-gray-900 transition-colors'>
               About
             </Link>
+            <Link href='/courses' className='text-gray-600 hover:text-gray-900 transition-colors'>
+              Contact
+            </Link>
           </nav>
 
           {/* Desktop Auth Buttons */}
           <div className='hidden md:flex items-center space-x-4'>
             {isAuthenticated ? (
-              <Link href='/dashboard'>
+              <Link href='/student'>
                 <Button>Go to Dashboard</Button>
               </Link>
             ) : (
@@ -66,10 +72,7 @@ const Header = () => {
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div
-          className='fixed inset-0 bg-black/50 z-40 md:hidden'
-          onClick={closeMobileMenu}
-        />
+        <div className='fixed inset-0 bg-black/50 z-40 md:hidden' onClick={closeMobileMenu} />
       )}
 
       {/* Mobile Menu Drawer */}
@@ -111,7 +114,7 @@ const Header = () => {
           {/* Auth Buttons */}
           <div className='p-4 border-t space-y-3'>
             {isAuthenticated ? (
-              <Link href='/dashboard' onClick={closeMobileMenu}>
+              <Link href='/student' onClick={closeMobileMenu}>
                 <Button className='w-full'>Go to Dashboard</Button>
               </Link>
             ) : (

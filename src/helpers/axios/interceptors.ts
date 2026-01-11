@@ -74,7 +74,6 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    // Let thunks decide when to show toast - this prevents duplicate toast messages
     return Promise.reject(error);
   }
 );

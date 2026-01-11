@@ -7,6 +7,7 @@ import uiReducer from './features/uiSlice';
 import cartReducer from './features/cartSlice';
 import paymentReducer from './features/paymentSlice';
 import chatReducer from './features/chatSlice';
+import categoryReducer from './features/categorySlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     cart: cartReducer,
     payment: paymentReducer,
     chat: chatReducer,
+    category: categoryReducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -28,4 +30,3 @@ export const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-

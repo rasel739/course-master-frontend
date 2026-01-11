@@ -73,7 +73,6 @@ export const fetchCurrentUser = createAsyncThunk(
       return response.data.data!;
     } catch (error: unknown) {
       const message = getErrorMessage(error);
-      // Silent failure - used for auth verification on page load
       return rejectWithValue(message);
     }
   }

@@ -31,6 +31,7 @@ import {
   SendMessageRequest,
   Instructor,
   Student,
+  Category,
 } from '@/types';
 
 
@@ -46,6 +47,13 @@ export const authApi = {
 
   refreshToken: () =>
     axiosInstance.post<ApiResponse<{ accessToken: string }>>('/auth/refresh-token'),
+};
+
+export const categoryApi = {
+  getCategories: (includeInactive?: boolean) =>
+    axiosInstance.get<ApiResponse<Category[]>>('/category', {
+      params: includeInactive ? { includeInactive: 'true' } : undefined,
+    }),
 };
 
 export const courseApi = {
@@ -192,6 +200,15 @@ export const adminApi = {
 
   getQuizzesByCourse: (courseId: string) =>
     axiosInstance.get<ApiResponse<Quiz[]>>(`/admin/courses/${courseId}/quizzes`),
+
+  createCategory: (data: { name: string; description?: string; order?: number }) =>
+    axiosInstance.post<ApiResponse<Category>>('/admin/categories', data),
+
+  updateCategory: (id: string, data: { name?: string; description?: string; isActive?: boolean; order?: number }) =>
+    axiosInstance.put<ApiResponse<Category>>(`/admin/categories/${id}`, data),
+
+  deleteCategory: (id: string) =>
+    axiosInstance.delete<ApiResponse<{ message: string }>>(`/admin/categories/${id}`),
 };
 
 export const paymentApi = {
@@ -243,7 +260,6 @@ export const chatApi = {
     axiosInstance.put<ApiResponse>(`/chat/messages/${messageId}/read`),
 };
 
-// Review API
 export const reviewApi = {
   getCourseReviews: (courseId: string, params?: { page?: number; limit?: number }) =>
     axiosInstance.get<ApiResponse<{
@@ -271,7 +287,6 @@ export const reviewApi = {
     axiosInstance.delete<ApiResponse>(`/reviews/${reviewId}`),
 };
 
-// Certificate API
 export const certificateApi = {
   getUserCertificates: () =>
     axiosInstance.get<ApiResponse<{
