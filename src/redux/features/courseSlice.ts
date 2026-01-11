@@ -28,7 +28,6 @@ const initialState: CourseState = {
   },
 };
 
-// Async thunks
 export const fetchCourses = createAsyncThunk(
   'course/fetchCourses',
   async (query: CourseQuery, { rejectWithValue }) => {
@@ -75,7 +74,6 @@ const courseSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Fetch Courses
     builder
       .addCase(fetchCourses.pending, (state) => {
         state.isLoading = true;
@@ -92,7 +90,6 @@ const courseSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Fetch Course By ID
     builder
       .addCase(fetchCourseById.pending, (state) => {
         state.isLoading = true;

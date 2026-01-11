@@ -38,11 +38,10 @@ const LoginContent = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Role-based redirection
       if (user.role === 'admin') {
         router.push('/admin');
       } else {
-        const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+        const callbackUrl = searchParams.get('callbackUrl') || '/student';
         router.push(callbackUrl);
       }
     }

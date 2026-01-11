@@ -38,7 +38,6 @@ const initialState: AdminState = {
   error: null,
 };
 
-// Course Management
 export const createCourse = createAsyncThunk(
   'admin/createCourse',
   async (courseData: Partial<Course>, { rejectWithValue }) => {
@@ -101,7 +100,6 @@ export const fetchCourseEnrollments = createAsyncThunk(
   }
 );
 
-// Module Management
 export const addModule = createAsyncThunk(
   'admin/addModule',
   async (
@@ -161,7 +159,6 @@ export const deleteModule = createAsyncThunk(
   }
 );
 
-// Lesson Management
 export const addLesson = createAsyncThunk(
   'admin/addLesson',
   async (
@@ -382,7 +379,6 @@ const adminSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Update Course
     builder
       .addCase(updateCourse.pending, (state) => {
         state.isLoading = true;
@@ -403,7 +399,6 @@ const adminSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Delete Course
     builder
       .addCase(deleteCourse.pending, (state) => {
         state.isLoading = true;
@@ -418,7 +413,6 @@ const adminSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Fetch Course Enrollments
     builder
       .addCase(fetchCourseEnrollments.pending, (state) => {
         state.isLoading = true;
@@ -433,47 +427,38 @@ const adminSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Add Module
     builder.addCase(addModule.fulfilled, (state, action) => {
       state.selectedCourse = action.payload;
     });
 
-    // Update Module
     builder.addCase(updateModule.fulfilled, (state, action) => {
       state.selectedCourse = action.payload;
     });
 
-    // Delete Module
     builder.addCase(deleteModule.fulfilled, (state, action) => {
       state.selectedCourse = action.payload;
     });
 
-    // Add Lesson
     builder.addCase(addLesson.fulfilled, (state, action) => {
       state.selectedCourse = action.payload;
     });
 
-    // Update Lesson
     builder.addCase(updateLesson.fulfilled, (state, action) => {
       state.selectedCourse = action.payload;
     });
 
-    // Delete Lesson
     builder.addCase(deleteLesson.fulfilled, (state, action) => {
       state.selectedCourse = action.payload;
     });
 
-    // Create Assignment
     builder.addCase(createAssignment.fulfilled, (state, action) => {
       state.assignments.push(action.payload);
     });
 
-    // Create Quiz
     builder.addCase(createQuiz.fulfilled, (state, action) => {
       state.quizzes.push(action.payload);
     });
 
-    // Fetch Analytics
     builder
       .addCase(fetchAnalytics.pending, (state) => {
         state.isLoading = true;
@@ -488,7 +473,6 @@ const adminSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Fetch Assignments
     builder
       .addCase(fetchAssignments.pending, (state) => {
         state.isLoading = true;
@@ -503,7 +487,6 @@ const adminSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Fetch Quizzes
     builder
       .addCase(fetchQuizzes.pending, (state) => {
         state.isLoading = true;
@@ -518,7 +501,6 @@ const adminSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Fetch All Enrollments
     builder
       .addCase(fetchAllEnrollments.pending, (state) => {
         state.isLoading = true;

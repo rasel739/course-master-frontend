@@ -36,15 +36,12 @@ const cartSlice = createSlice({
             state.items = [];
         },
         applyCoupon: (state, action: PayloadAction<string>) => {
-            // In a real app, this would validate the coupon with the backend
-            // For now, we just store it
         },
     },
 });
 
 export const { addToCart, removeFromCart, clearCart, applyCoupon } = cartSlice.actions;
 
-// Selectors
 export const selectCartItems = (state: { cart: CartState }) => state.cart.items;
 export const selectCartTotal = (state: { cart: CartState }) =>
     state.cart.items.reduce((total, item) => total + item.course.price, 0);

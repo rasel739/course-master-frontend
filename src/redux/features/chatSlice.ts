@@ -37,7 +37,6 @@ const initialState: ChatState = {
     error: null,
 };
 
-// Async thunks
 export const fetchInstructors = createAsyncThunk(
     'chat/fetchInstructors',
     async (_, { rejectWithValue }) => {
@@ -183,7 +182,6 @@ const chatSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // Fetch instructors
         builder
             .addCase(fetchInstructors.pending, (state) => {
                 state.isLoading = true;
@@ -197,7 +195,6 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Fetch students (for admin)
         builder
             .addCase(fetchStudents.pending, (state) => {
                 state.isLoading = true;
@@ -211,12 +208,10 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Fetch unread count
         builder.addCase(fetchUnreadCount.fulfilled, (state, action) => {
             state.unreadCount = action.payload;
         });
 
-        // Fetch conversations
         builder
             .addCase(fetchConversations.pending, (state) => {
                 state.isLoading = true;
@@ -230,7 +225,6 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Fetch conversation by ID
         builder
             .addCase(fetchConversationById.pending, (state) => {
                 state.isLoading = true;
@@ -244,7 +238,6 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Fetch messages
         builder
             .addCase(fetchMessages.pending, (state) => {
                 state.isMessagesLoading = true;
@@ -258,7 +251,6 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Create conversation
         builder
             .addCase(createConversation.pending, (state) => {
                 state.isLoading = true;
@@ -266,7 +258,6 @@ const chatSlice = createSlice({
             .addCase(createConversation.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.activeConversation = action.payload;
-                // Add to conversations if not already present
                 const exists = state.conversations.find((c) => c._id === action.payload._id);
                 if (!exists) {
                     state.conversations.unshift(action.payload);
@@ -277,7 +268,6 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Send message
         builder
             .addCase(sendMessage.pending, (state) => {
                 state.isSending = true;
@@ -285,7 +275,6 @@ const chatSlice = createSlice({
             .addCase(sendMessage.fulfilled, (state, action) => {
                 state.isSending = false;
                 state.messages.push(action.payload);
-                // Update conversation's last message
                 const conversation = state.conversations.find(
                     (c) => c._id === action.payload.conversation
                 );
@@ -304,13 +293,11 @@ const chatSlice = createSlice({
                 state.error = action.payload as string;
             });
 
-        // Mark conversation as read
         builder.addCase(markConversationAsRead.fulfilled, (state, action) => {
             const conversation = state.conversations.find((c) => c._id === action.payload);
             if (conversation) {
                 conversation.unreadCount = 0;
             }
-            // Recalculate total unread
             state.unreadCount = state.conversations.reduce(
                 (sum, c) => sum + (c.unreadCount || 0),
                 0

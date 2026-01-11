@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import { Home, ArrowLeft, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 const NotFound = () => {
+  const navigate = useRouter();
+
   return (
     <div className='min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-4'>
       <div className='max-w-lg w-full text-center'>
@@ -26,7 +29,7 @@ const NotFound = () => {
         </p>
 
         <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-          <Link href='/dashboard'>
+          <Link href='/'>
             <Button size='lg' className='w-full sm:w-auto'>
               <Home className='w-4 h-4 mr-2' />
               Go Home
@@ -35,7 +38,7 @@ const NotFound = () => {
           <Button
             size='lg'
             variant='outline'
-            onClick={() => window.history.back()}
+            onClick={() => navigate.back()}
             className='w-full sm:w-auto'
           >
             <ArrowLeft className='w-4 h-4 mr-2' />
