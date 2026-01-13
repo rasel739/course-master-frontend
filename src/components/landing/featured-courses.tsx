@@ -60,9 +60,14 @@ export const FeaturedCourses = () => {
 
   // Calculate total duration from modules
   const getTotalDuration = (course: Course) => {
-    const totalMinutes = course.modules?.reduce((sum, module) =>
-      sum + (module.lessons?.reduce((lessonSum, lesson) => lessonSum + (lesson.duration || 0), 0) || 0)
-      , 0) || 0;
+    const totalMinutes =
+      course.modules?.reduce(
+        (sum, module) =>
+          sum +
+          (module.lessons?.reduce((lessonSum, lesson) => lessonSum + (lesson.duration || 0), 0) ||
+            0),
+        0
+      ) || 0;
     const hours = Math.floor(totalMinutes / 60);
     return hours > 0 ? `${hours} hours` : `${totalMinutes} mins`;
   };
@@ -89,8 +94,12 @@ export const FeaturedCourses = () => {
         {/* Header */}
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8'>
           <div>
-            <h2 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2'>Featured Courses</h2>
-            <p className='text-gray-600 text-sm sm:text-base'>Learn from the best instructors worldwide</p>
+            <h2 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2'>
+              Featured Courses
+            </h2>
+            <p className='text-gray-600 text-sm sm:text-base'>
+              Learn from the best instructors worldwide
+            </p>
           </div>
           {/* Desktop scroll buttons */}
           <div className='hidden sm:flex items-center space-x-2'>
@@ -124,12 +133,12 @@ export const FeaturedCourses = () => {
         >
           {courses.map((course) => (
             <Link
-              href={`/courses/${course._id}`}
+              href={`/course/${course._id}`}
               key={course._id}
               className='shrink-0 w-[260px] sm:w-[280px] md:w-[320px] group snap-start'
             >
               <Card className='overflow-hidden hover-lift border-0 shadow-md hover:shadow-xl transition-all duration-300'>
-                <div className='relative h-[140px] sm:h-[160px] md:h-[180px] bg-gray-200'>
+                <div className='relative h-[140px] sm:h-40 md:h-[180px] bg-gray-200'>
                   {course.thumbnail ? (
                     <Image
                       src={course.thumbnail}
@@ -138,7 +147,7 @@ export const FeaturedCourses = () => {
                       className='object-cover'
                     />
                   ) : (
-                    <div className='absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20' />
+                    <div className='absolute inset-0 bg-linear-to-br from-blue-500/20 to-purple-600/20' />
                   )}
                   {course.totalEnrollments > 100 && (
                     <Badge className='absolute top-2 left-2 sm:top-3 sm:left-3 bg-yellow-500 text-black font-bold text-xs'>
@@ -147,13 +156,16 @@ export const FeaturedCourses = () => {
                   )}
                   <div className='absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center'>
                     <div className='w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all transform scale-75 group-hover:scale-100'>
-                      <Play className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-600 ml-0.5' fill='currentColor' />
+                      <Play
+                        className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-blue-600 ml-0.5'
+                        fill='currentColor'
+                      />
                     </div>
                   </div>
                 </div>
 
                 <CardContent className='p-3 sm:p-4'>
-                  <h3 className='font-bold text-sm sm:text-base text-gray-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[2.5rem] sm:min-h-[3rem]'>
+                  <h3 className='font-bold text-sm sm:text-base text-gray-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors min-h-10 sm:min-h-12'>
                     {course.title}
                   </h3>
                   <p className='text-xs sm:text-sm text-gray-500 mb-2'>
@@ -180,7 +192,9 @@ export const FeaturedCourses = () => {
                   </div>
 
                   <div className='flex items-center space-x-2'>
-                    <span className='text-lg sm:text-xl font-bold text-gray-900'>${course.price || 0}</span>
+                    <span className='text-lg sm:text-xl font-bold text-gray-900'>
+                      ${course.price || 0}
+                    </span>
                     {course.price && course.price < 100 && (
                       <span className='text-xs sm:text-sm text-gray-500 line-through'>
                         ${Math.round((course.price || 0) * 1.8)}
@@ -195,7 +209,7 @@ export const FeaturedCourses = () => {
 
         {/* View All Button */}
         <div className='text-center mt-6 sm:mt-8'>
-          <Link href='/courses'>
+          <Link href='/course'>
             <Button size='lg' variant='outline' className='px-6 sm:px-8 text-sm sm:text-base'>
               View All Courses
             </Button>

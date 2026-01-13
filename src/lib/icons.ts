@@ -13,6 +13,7 @@ import {
   Users,
   FileText,
   ClipboardList,
+  Settings,
 } from 'lucide-react';
 
 export const Icons = {
@@ -31,4 +32,5 @@ export const Icons = {
   Assignments: FileText,
   Quizzes: ClipboardList,
   Analytics: BarChart3,
+  Settings: Settings,
 };

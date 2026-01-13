@@ -2,26 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, FileText, Users, CheckCircle, Clock, User } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/utils';
 import { adminApi } from '@/helpers/axios/api';
 import Loading from '@/app/loading';
-import { Assignment } from '@/types';
+import { Assignment, Submission } from '@/types';
+import { INSIDE_ASSIGNMENT_STATS } from '@/constants';
 
-interface Submission {
-  _id: string;
-  user: { _id: string; name: string; email: string } | string;
-  submissionType: 'text' | 'link';
-  content: string;
-  submittedAt: string;
-  grade?: number;
-  feedback?: string;
-}
-
-export default function AdminAssignmentDetailPage() {
+const AdminAssignmentDetailPage = () => {
   const params = useParams();
   const router = useRouter();
   const [assignment, setAssignment] = useState<Assignment | null>(null);
@@ -40,8 +31,8 @@ export default function AdminAssignmentDetailPage() {
           setError('Assignment not found');
         }
       } catch (err) {
-        console.error('Error fetching assignment:', err);
-        setError('Failed to load assignment');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load assignment';
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -96,58 +87,35 @@ export default function AdminAssignmentDetailPage() {
 
       {/* Statistics */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <Users className='w-5 h-5 text-blue-600' />
+        {INSIDE_ASSIGNMENT_STATS({
+          submissionsCount: submissions.length,
+          gradedCount,
+          pendingCount,
+          assignmentDate: assignment.createdAt,
+        }).map((stat, index) => (
+          <Card key={index}>
+            <CardContent className='p-4'>
+              <div className='flex items-center space-x-3'>
+                <div
+                  className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center`}
+                >
+                  <div className={stat.iconColor}>{<stat.icon />}</div>
+                </div>
+                <div>
+                  <p
+                    className={`${
+                      stat.label === 'Created' ? '' : 'text-2xl'
+                    } font-bold text-gray-900`}
+                  >
+                    {stat.value}
+                  </p>
+                  <p className='text-sm text-gray-600'>{stat.label}</p>
+                </div>
               </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{submissions.length}</p>
-                <p className='text-sm text-gray-600'>Submissions</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center'>
-                <CheckCircle className='w-5 h-5 text-green-600' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{gradedCount}</p>
-                <p className='text-sm text-gray-600'>Graded</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <Clock className='w-5 h-5 text-orange-600' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{pendingCount}</p>
-                <p className='text-sm text-gray-600'>Pending</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <FileText className='w-5 h-5 text-purple-600' />
-              </div>
-              <div>
-                <p className='text-sm font-medium text-gray-900'>Created</p>
-                <p className='text-sm text-gray-600'>{formatDate(assignment.createdAt)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
+        ;
       </div>
 
       {/* Description */}
@@ -232,4 +200,5 @@ export default function AdminAssignmentDetailPage() {
       </Card>
     </div>
   );
-}
+};
+export default AdminAssignmentDetailPage;

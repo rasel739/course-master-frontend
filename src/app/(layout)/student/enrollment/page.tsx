@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, Clock, Play, TrendingUp, Award } from 'lucide-react';
+import { BookOpen, Clock, Play, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Course } from '@/types';
@@ -15,7 +15,7 @@ const Enrollment = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { enrollments, isLoading } = useAppSelector((state) => state.enrollment);
-  console.log(enrollments);
+  const { user } = useAppSelector((state) => state.auth);
   useEffect(() => {
     dispatch(fetchDashboard());
   }, [dispatch]);
@@ -28,7 +28,9 @@ const Enrollment = () => {
     <div className='space-y-4 sm:space-y-6'>
       <div>
         <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>My Enrollments</h1>
-        <p className='text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base'>Track your learning progress</p>
+        <p className='text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base'>
+          Track your learning progress
+        </p>
       </div>
 
       {/* Stats Overview */}
@@ -97,14 +99,14 @@ const Enrollment = () => {
               enrollment?.progress === 100
                 ? 'bg-green-600'
                 : enrollment.progress > 0
-                  ? 'bg-blue-600'
-                  : 'bg-gray-300';
+                ? 'bg-blue-600'
+                : 'bg-gray-300';
 
             return (
               <Card
                 key={enrollment._id}
                 className='hover:shadow-lg transition-shadow cursor-pointer'
-                onClick={() => router.push(`/enrollment/${enrollment?._id}`)}
+                onClick={() => router.push(`/${user?.role}/enrollment/${enrollment?._id}`)}
               >
                 <CardContent className='p-6'>
                   <div className='flex flex-col md:flex-row md:items-center gap-6'>

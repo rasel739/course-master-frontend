@@ -30,13 +30,13 @@ const Header = () => {
             <Link href='/' className='text-gray-600 hover:text-gray-900 transition-colors'>
               Home
             </Link>
-            <Link href='/courses' className='text-gray-600 hover:text-gray-900 transition-colors'>
+            <Link href='/course' className='text-gray-600 hover:text-gray-900 transition-colors'>
               Courses
             </Link>
             <Link href='/about' className='text-gray-600 hover:text-gray-900 transition-colors'>
               About
             </Link>
-            <Link href='/courses' className='text-gray-600 hover:text-gray-900 transition-colors'>
+            <Link href='/contact' className='text-gray-600 hover:text-gray-900 transition-colors'>
               Contact
             </Link>
           </nav>
@@ -96,7 +96,7 @@ const Header = () => {
           {/* Navigation Links */}
           <nav className='flex-1 p-4 space-y-2'>
             <Link
-              href='/courses'
+              href='/course'
               onClick={closeMobileMenu}
               className='block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium'
             >

@@ -2,12 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen, Users, GraduationCap, TrendingUp, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchAnalytics } from '@/redux/features/adminSlice';
 import Loading from '@/app/loading';
+import { ADMIN_DASHBOARD_CARDS, DASHBOARD_ANALYTICS_STATS } from '@/constants';
 
 const AdminDashboard = () => {
   const router = useRouter();
@@ -25,37 +26,6 @@ const AdminDashboard = () => {
     return <Loading />;
   }
 
-  const stats = [
-    {
-      title: 'Total Courses',
-      value: analytics?.overview.totalCourses || 0,
-      icon: BookOpen,
-      color: 'bg-blue-100 text-blue-600',
-      href: '/admin/course',
-    },
-    {
-      title: 'Total Students',
-      value: analytics?.overview.totalStudents || 0,
-      icon: Users,
-      color: 'bg-purple-100 text-purple-600',
-      href: '/admin/students',
-    },
-    {
-      title: 'Total Enrollments',
-      value: analytics?.overview.totalEnrollments || 0,
-      icon: GraduationCap,
-      color: 'bg-green-100 text-green-600',
-      href: '/admin/analytics',
-    },
-    {
-      title: 'Active Courses',
-      value: analytics?.overview.totalCourses || 0,
-      icon: TrendingUp,
-      color: 'bg-orange-100 text-orange-600',
-      href: '/admin/course',
-    },
-  ];
-
   return (
     <div className='space-y-6'>
       {/* Welcome Section */}
@@ -66,7 +36,7 @@ const AdminDashboard = () => {
 
       {/* Stats Grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        {stats.map((stat, index) => (
+        {DASHBOARD_ANALYTICS_STATS(analytics)?.map((stat, index) => (
           <Card
             key={index}
             className='hover:shadow-lg transition-shadow cursor-pointer'
@@ -89,53 +59,25 @@ const AdminDashboard = () => {
 
       {/* Quick Actions */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-        <Card className='hover:shadow-lg transition-shadow'>
-          <CardHeader>
-            <CardTitle className='flex items-center'>
-              <BookOpen className='w-5 h-5 mr-2 text-blue-600' />
-              Manage Courses
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-3'>
-            <p className='text-sm text-gray-600 mb-4'>Create, edit, and manage course content</p>
-            <Button className='w-full' onClick={() => router.push('/admin/course')}>
-              Go to Courses
-              <ChevronRight className='w-4 h-4 ml-1' />
-            </Button>
-          </CardContent>
-        </Card>
+        {ADMIN_DASHBOARD_CARDS.map((card, index) => (
+          <Card key={index} className='hover:shadow-lg transition-shadow'>
+            <CardHeader>
+              <CardTitle className='flex items-center'>
+                {<card.icon className={card.color} />}
+                {card.title}
+              </CardTitle>
+            </CardHeader>
 
-        <Card className='hover:shadow-lg transition-shadow'>
-          <CardHeader>
-            <CardTitle className='flex items-center'>
-              <Users className='w-5 h-5 mr-2 text-purple-600' />
-              Student Management
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-3'>
-            <p className='text-sm text-gray-600 mb-4'>View and manage student enrollments</p>
-            <Button className='w-full' onClick={() => router.push('/admin/students')}>
-              View Students
-              <ChevronRight className='w-4 h-4 ml-1' />
-            </Button>
-          </CardContent>
-        </Card>
+            <CardContent className='space-y-3'>
+              <p className='text-sm text-gray-600 mb-4'>{card.description}</p>
 
-        <Card className='hover:shadow-lg transition-shadow'>
-          <CardHeader>
-            <CardTitle className='flex items-center'>
-              <TrendingUp className='w-5 h-5 mr-2 text-green-600' />
-              Analytics
-            </CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-3'>
-            <p className='text-sm text-gray-600 mb-4'>View detailed platform analytics</p>
-            <Button className='w-full' onClick={() => router.push('/admin/analytics')}>
-              View Analytics
-              <ChevronRight className='w-4 h-4 ml-1' />
-            </Button>
-          </CardContent>
-        </Card>
+              <Button className='w-full' onClick={() => router.push(card.route)}>
+                {card.buttonText}
+                <ChevronRight className='w-4 h-4 ml-1' />
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Recent Activity */}

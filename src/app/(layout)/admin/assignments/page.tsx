@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, FileText, Users, CheckCircle, Clock, Eye } from 'lucide-react';
+import { Plus, Search, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,8 +11,11 @@ import AssignmentDialog from '@/components/admin/assignment-dialog';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchAssignments } from '@/redux/features/adminSlice';
 import Loading from '@/app/loading';
+import StatsCard from '@/components/admin/stats_card';
+import { IAssinmentAnalytics } from '@/types';
+import { ASSIGNMENT_ANALYTICS_STATS, ASSIGNMENT_TABLE_ITEMS } from '@/constants';
 
-export default function AdminAssignmentsPage() {
+const AdminAssignmentsPage = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { assignments, isLoading } = useAppSelector((state) => state.admin);
@@ -57,55 +60,15 @@ export default function AdminAssignmentsPage() {
       </div>
 
       {/* Statistics */}
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <FileText className='w-6 h-6 text-blue-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{totalAssignments}</h3>
-            <p className='text-sm text-gray-600'>Total Assignments</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <Users className='w-6 h-6 text-purple-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{totalSubmissions}</h3>
-            <p className='text-sm text-gray-600'>Total Submissions</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <CheckCircle className='w-6 h-6 text-green-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{gradedSubmissions}</h3>
-            <p className='text-sm text-gray-600'>Graded</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <Clock className='w-6 h-6 text-orange-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{pendingGrading}</h3>
-            <p className='text-sm text-gray-600'>Pending Grading</p>
-          </CardContent>
-        </Card>
-      </div>
+      <StatsCard
+        analytics={{
+          totalAssignments,
+          totalSubmissions,
+          gradedSubmissions,
+          pendingGrading,
+        }}
+        ANALYTICS_STATS={(data) => ASSIGNMENT_ANALYTICS_STATS(data as IAssinmentAnalytics)}
+      />
 
       {/* Search */}
       <div className='relative'>
@@ -126,24 +89,11 @@ export default function AdminAssignmentsPage() {
             <table className='w-full'>
               <thead className='bg-gray-50 border-b'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Assignment
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Course
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Submissions
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Graded
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Created
-                  </th>
-                  <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase'>
-                    Actions
-                  </th>
+                  {ASSIGNMENT_TABLE_ITEMS.map((item, index) => (
+                    <th key={index} className={item.style}>
+                      {item.title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>
@@ -223,4 +173,6 @@ export default function AdminAssignmentsPage() {
       {dialogOpen && <AssignmentDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />}
     </div>
   );
-}
+};
+
+export default AdminAssignmentsPage;

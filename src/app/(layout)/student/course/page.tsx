@@ -27,6 +27,7 @@ const Course = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { courses, pagination, isLoading, filters } = useAppSelector((state) => state.course);
+  const { user } = useAppSelector((state) => state.auth);
   const { categories } = useAppSelector((state) => state.category);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -60,7 +61,9 @@ const Course = () => {
     <div className='space-y-4 sm:space-y-6'>
       <div>
         <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>Explore Courses</h1>
-        <p className='text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base'>Discover courses from expert instructors</p>
+        <p className='text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base'>
+          Discover courses from expert instructors
+        </p>
       </div>
 
       <div className='space-y-3 sm:space-y-4'>
@@ -116,8 +119,12 @@ const Course = () => {
         <Card>
           <CardContent className='p-8 sm:p-12 text-center'>
             <Search className='w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-3 sm:mb-4' />
-            <h3 className='text-lg sm:text-xl font-semibold text-gray-900 mb-2'>No Courses Found</h3>
-            <p className='text-gray-600 text-sm sm:text-base'>Try adjusting your search or filters</p>
+            <h3 className='text-lg sm:text-xl font-semibold text-gray-900 mb-2'>
+              No Courses Found
+            </h3>
+            <p className='text-gray-600 text-sm sm:text-base'>
+              Try adjusting your search or filters
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -127,9 +134,9 @@ const Course = () => {
               <Card
                 key={course._id}
                 className='hover:shadow-xl transition-all cursor-pointer group'
-                onClick={() => router.push(`/courses/${course._id}`)}
+                onClick={() => router.push(`/${user?.role}/course/${course._id}`)}
               >
-                <div className='relative h-36 sm:h-44 md:h-48 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden rounded-t-lg'>
+                <div className='relative h-36 sm:h-44 md:h-48 bg-linear-to-br from-blue-500 to-purple-600 overflow-hidden rounded-t-lg'>
                   <Image src={`${course?.thumbnail}`} alt='course-image' fill />
                   <div className='absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all' />
                   <div className='absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4'>
@@ -144,7 +151,9 @@ const Course = () => {
                     {course.title}
                   </h3>
 
-                  <p className='text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2'>{course.description}</p>
+                  <p className='text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2'>
+                    {course.description}
+                  </p>
 
                   {/* Rating */}
                   <div className='flex items-center gap-2 mb-3'>
@@ -170,10 +179,10 @@ const Course = () => {
                       <Clock className='w-4 h-4 mr-1' />
                       {formatDuration(
                         course.totalDuration ||
-                        course.modules.reduce(
-                          (sum, m) => sum + m.lessons.reduce((s, l) => s + l.duration, 0),
-                          0
-                        )
+                          course.modules.reduce(
+                            (sum, m) => sum + m.lessons.reduce((s, l) => s + l.duration, 0),
+                            0
+                          )
                       )}
                     </span>
                   </div>

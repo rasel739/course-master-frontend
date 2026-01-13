@@ -37,7 +37,7 @@ export const CourseCard = ({
 
   if (variant === 'horizontal') {
     return (
-      <Link href={`/courses/${course._id}`} className={cn('block group', className)}>
+      <Link href={`/course/${course._id}`} className={cn('block group', className)}>
         <Card className='overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1'>
           <div className='flex flex-col md:flex-row'>
             <div className='relative w-full md:w-64 h-48 md:h-auto shrink-0 bg-gray-200'>
@@ -61,7 +61,9 @@ export const CourseCard = ({
                   <div className='flex items-center space-x-2 mb-2'>
                     <span className='font-bold text-amber-700'>{rating.toFixed(1)}</span>
                     <Rating value={rating} size='sm' />
-                    <span className='text-xs text-gray-500'>({reviewCount.toLocaleString()} reviews)</span>
+                    <span className='text-xs text-gray-500'>
+                      ({reviewCount.toLocaleString()} reviews)
+                    </span>
                   </div>
 
                   <div className='flex items-center space-x-4 text-xs text-gray-500'>
@@ -94,7 +96,7 @@ export const CourseCard = ({
 
   if (variant === 'compact') {
     return (
-      <Link href={`/courses/${course._id}`} className={cn('block group', className)}>
+      <Link href={`/course/${course._id}`} className={cn('block group', className)}>
         <div className='flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors'>
           <div className='relative w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-gray-200'>
             {course.thumbnail ? (
@@ -119,7 +121,7 @@ export const CourseCard = ({
 
   // Default variant
   return (
-    <Link href={`/courses/${course._id}`} className={cn('block group', className)}>
+    <Link href={`/course/${course._id}`} className={cn('block group', className)}>
       <Card className='overflow-hidden hover-lift border-0 shadow-md hover:shadow-xl transition-all duration-300'>
         <div className='relative h-[180px] bg-gray-200'>
           {course.thumbnail ? (
