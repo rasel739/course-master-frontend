@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Search, ClipboardList, Users, TrendingUp, Award, Eye } from 'lucide-react';
+import { Plus, Search, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,6 +11,9 @@ import QuizDialog from '@/components/admin/quiz-dialog';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchQuizzes } from '@/redux/features/adminSlice';
 import Loading from '@/app/loading';
+import StatsCard from '@/components/admin/stats_card';
+import { IQuizzzAnalytics } from '@/types';
+import { QUIZ_ANALYTICS_STATS, QUIZ_TABLE_ITEMS } from '@/constants';
 
 const AdminQuizzes = () => {
   const router = useRouter();
@@ -76,55 +79,10 @@ const AdminQuizzes = () => {
       </div>
 
       {/* Statistics */}
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <ClipboardList className='w-6 h-6 text-blue-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{totalQuizzes}</h3>
-            <p className='text-sm text-gray-600'>Total Quizzes</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <Users className='w-6 h-6 text-purple-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{totalAttempts}</h3>
-            <p className='text-sm text-gray-600'>Total Attempts</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <TrendingUp className='w-6 h-6 text-green-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{avgScore}%</h3>
-            <p className='text-sm text-gray-600'>Average Score</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <Award className='w-6 h-6 text-orange-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{passRate}%</h3>
-            <p className='text-sm text-gray-600'>Pass Rate</p>
-          </CardContent>
-        </Card>
-      </div>
+      <StatsCard
+        analytics={{ totalQuizzes, totalAttempts, avgScore, passRate }}
+        ANALYTICS_STATS={(data) => QUIZ_ANALYTICS_STATS(data as IQuizzzAnalytics)}
+      />
 
       {/* Search */}
       <div className='relative'>
@@ -145,27 +103,11 @@ const AdminQuizzes = () => {
             <table className='w-full'>
               <thead className='bg-gray-50 border-b'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Quiz
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Course
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Questions
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Attempts
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Avg Score
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Created
-                  </th>
-                  <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase'>
-                    Actions
-                  </th>
+                  {QUIZ_TABLE_ITEMS.map((item, index) => (
+                    <th key={index} className={item.style}>
+                      {item.title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>

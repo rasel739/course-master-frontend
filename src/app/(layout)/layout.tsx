@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
@@ -8,15 +8,12 @@ import { fetchUnreadCount } from '@/redux/features/chatSlice';
 import { toggleSidebar } from '@/redux/features/uiSlice';
 import { Icons } from '@/lib/icons';
 import Sidebar from '@/components/layout/sidebar';
-import Loading from '../loading';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { sidebarOpen } = useAppSelector((state) => state.ui);
-
-  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
     const token = Cookies.get('accessToken');
@@ -27,10 +24,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     if (!user) {
       dispatch(fetchCurrentUser()).finally(() => {
-        setIsInitializing(false);
+        if (!isAuthenticated) {
+          router.replace('/login');
+        }
       });
     }
-  }, [dispatch, router, user]);
+  }, [dispatch, router, user, isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated && user && !isLoading) {
@@ -45,10 +44,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }, 30000);
     return () => clearInterval(interval);
   }, [dispatch, isAuthenticated, user]);
-
-  if (isInitializing || isLoading) {
-    return <Loading />;
-  }
 
   return (
     <div className='min-h-screen bg-gray-50'>

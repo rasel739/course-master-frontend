@@ -1,3 +1,5 @@
+import { LucideIcon } from 'lucide-react';
+
 export type UserRole = 'student' | 'admin';
 
 export interface User {
@@ -400,4 +402,31 @@ export interface ChatMessagesResponse {
   pagination: ChatMessagesPagination;
 }
 
+export type IStatCard = {
+  icon: LucideIcon;
+  bgColor: string;
+  iconColor: string;
+  value: number | string;
+  label: string;
+};
 
+export interface IQuizzzAnalytics {
+  totalQuizzes: number;
+  totalAttempts: number;
+  avgScore: number;
+  passRate: number;
+}
+
+export interface IAssinmentAnalytics {
+  totalAssignments: number;
+  totalSubmissions: number;
+  gradedSubmissions: number;
+  pendingGrading: number;
+}
+
+export interface IStudentAnalytics {
+  totalStudents: number;
+  totalEnrollments: number;
+  activeStudents: number;
+  avgProgress: number;
+}

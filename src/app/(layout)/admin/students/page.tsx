@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Eye, UserCheck, GraduationCap, TrendingUp } from 'lucide-react';
+import { Search, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDate, getInitials } from '@/utils';
-import { Course, User } from '@/types';
+import { Course, IStudentAnalytics, User } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchAllEnrollments } from '@/redux/features/adminSlice';
 import { fetchCourses } from '@/redux/features/courseSlice';
 import Loading from '@/app/loading';
+import StatsCard from '@/components/admin/stats_card';
+import { STUDENT_ANALYTICS_STATS, STUDENT_TABLE_ITEMS } from '@/constants';
 
 const AdminStudents = () => {
   const router = useRouter();
@@ -62,55 +64,10 @@ const AdminStudents = () => {
       </div>
 
       {/* Statistics */}
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <UserCheck className='w-6 h-6 text-blue-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{totalStudents}</h3>
-            <p className='text-sm text-gray-600'>Total Students</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <GraduationCap className='w-6 h-6 text-purple-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{totalEnrollments}</h3>
-            <p className='text-sm text-gray-600'>Total Enrollments</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <TrendingUp className='w-6 h-6 text-green-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{activeStudents}</h3>
-            <p className='text-sm text-gray-600'>Active Students</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <TrendingUp className='w-6 h-6 text-orange-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>{avgProgress}%</h3>
-            <p className='text-sm text-gray-600'>Average Progress</p>
-          </CardContent>
-        </Card>
-      </div>
+      <StatsCard
+        analytics={{ totalStudents, totalEnrollments, activeStudents, avgProgress }}
+        ANALYTICS_STATS={(data) => STUDENT_ANALYTICS_STATS(data as IStudentAnalytics)}
+      />
 
       {/* Filters */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -146,24 +103,11 @@ const AdminStudents = () => {
             <table className='w-full'>
               <thead className='bg-gray-50 border-b'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Student
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Course
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Progress
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Enrolled Date
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase'>
-                    Lessons Completed
-                  </th>
-                  <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase'>
-                    Actions
-                  </th>
+                  {STUDENT_TABLE_ITEMS.map((item) => (
+                    <th key={item.title} className={item.style}>
+                      {item.title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>

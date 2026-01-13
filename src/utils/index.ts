@@ -1,3 +1,4 @@
+import { IAnalyticsData } from '@/types';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -38,13 +39,15 @@ export function truncateText(text: string, length: number): string {
 
 export function getInitials(name: string): string {
   if (!name || name.trim().length === 0) return '?';
-  return name
-    .split(' ')
-    .filter((word) => word.length > 0)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || '?';
+  return (
+    name
+      .split(' ')
+      .filter((word) => word.length > 0)
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || '?'
+  );
 }
 
 export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
@@ -80,3 +83,16 @@ export function getErrorMessage(error: unknown): string {
 
   return 'Something went wrong';
 }
+
+export const exportData = (analytics: IAnalyticsData | null) => {
+  if (!analytics) return;
+
+  const data = JSON.stringify(analytics, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `analytics-${new Date().toISOString()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};

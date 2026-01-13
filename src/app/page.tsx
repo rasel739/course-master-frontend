@@ -50,7 +50,7 @@ export default function Home() {
                   <ArrowRight className='ml-2 w-4 h-4 sm:w-5 sm:h-5' />
                 </Button>
               </Link>
-              <Link href='/courses'>
+              <Link href='/course'>
                 <Button
                   size='lg'
                   variant='outline'
@@ -243,7 +243,7 @@ export default function Home() {
                   <ArrowRight className='ml-2 w-4 h-4 sm:w-5 sm:h-5' />
                 </Button>
               </Link>
-              <Link href='/courses'>
+              <Link href='/course'>
                 <Button
                   size='lg'
                   variant='outline'

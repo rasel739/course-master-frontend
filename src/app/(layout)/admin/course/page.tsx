@@ -11,6 +11,7 @@ import { fetchCourses } from '@/redux/features/courseSlice';
 import { deleteCourse } from '@/redux/features/adminSlice';
 import { formatPrice, formatDate } from '@/utils';
 import Loading from '@/app/loading';
+import { COURSE_STATS, COURSE_TABLE_ITEMS } from '@/constants';
 
 const AdminCourse = () => {
   const router = useRouter();
@@ -72,36 +73,19 @@ const AdminCourse = () => {
 
       {/* Stats */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-        <Card>
-          <CardContent className='p-4'>
-            <p className='text-sm text-gray-600'>Total Courses</p>
-            <p className='text-2xl font-bold text-gray-900'>{courses?.length}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <p className='text-sm text-gray-600'>Published</p>
-            <p className='text-2xl font-bold text-green-600'>
-              {courses?.filter((c) => c.isPublished).length}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <p className='text-sm text-gray-600'>Draft</p>
-            <p className='text-2xl font-bold text-orange-600'>
-              {courses?.filter((c) => !c.isPublished).length}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <p className='text-sm text-gray-600'>Total Enrollments</p>
-            <p className='text-2xl font-bold text-blue-600'>
-              {courses?.reduce((sum, c) => sum + c.totalEnrollments, 0)}
-            </p>
-          </CardContent>
-        </Card>
+        {COURSE_STATS({
+          coursesCount: courses?.length || 0,
+          publishedCount: courses?.filter((c) => c.isPublished).length || 0,
+          draftCount: courses?.filter((c) => !c.isPublished).length || 0,
+          totalEnrollments: courses?.reduce((sum, c) => sum + c.totalEnrollments, 0) || 0,
+        }).map((stat) => (
+          <Card key={stat.label}>
+            <CardContent className='p-4'>
+              <p className='text-sm text-gray-600'>{stat.label}</p>
+              <p className={`text-2xl font-bold ${stat.valueColor}`}>{stat.value}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <Card>
@@ -110,27 +94,11 @@ const AdminCourse = () => {
             <table className='w-full'>
               <thead className='bg-gray-50 border-b'>
                 <tr>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Course
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Category
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Price
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Enrollments
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Status
-                  </th>
-                  <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Created
-                  </th>
-                  <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                    Actions
-                  </th>
+                  {COURSE_TABLE_ITEMS.map((item) => (
+                    <th key={item.title} className={item.style}>
+                      {item.title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className='bg-white divide-y divide-gray-200'>

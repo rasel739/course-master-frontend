@@ -194,8 +194,8 @@ Configured with custom colors and compatibility. See `tailwind.config.js`.
 ### Protected Routes (Student/Admin)
 
 - `/dashboard` - User dashboard
-- `/courses` - Browse courses
-- `/courses/[id]` - Course details
+- `/course` - Browse courses
+- `/course/[id]` - Course details
 - `/enrollments` - My enrollments
 - `/enrollments/[id]` - Enrollment details
 

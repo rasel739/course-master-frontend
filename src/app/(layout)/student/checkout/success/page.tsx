@@ -85,7 +85,7 @@ const CheckoutSuccessPage = () => {
             Go to Dashboard
           </Button>
         </Link>
-        <Link href='/courses'>
+        <Link href='/course'>
           <Button size='lg' variant='outline' className='w-full sm:w-auto'>
             Browse More Courses
             <ArrowRight className='w-5 h-5 ml-2' />

@@ -79,6 +79,37 @@ export default function AdminQuizDetailPage() {
   const passRate = attempts.length > 0 ? Math.round((passCount / attempts.length) * 100) : 0;
   const courseTitle = typeof quiz.course === 'object' ? quiz?.course?.title : 'Unknown Course';
 
+  const quizStats = [
+    {
+      icon: <HelpCircle className='w-5 h-5' />,
+      value: quiz.questions?.length || 0,
+      label: 'Questions',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+    },
+    {
+      icon: <Users className='w-5 h-5' />,
+      value: attempts.length,
+      label: 'Attempts',
+      bgColor: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+    },
+    {
+      icon: <TrendingUp className='w-5 h-5' />,
+      value: `${avgScore}%`,
+      label: 'Avg Score',
+      bgColor: 'bg-green-100',
+      iconColor: 'text-green-600',
+    },
+    {
+      icon: <Award className='w-5 h-5' />,
+      value: `${passRate}%`,
+      label: 'Pass Rate',
+      bgColor: 'bg-orange-100',
+      iconColor: 'text-orange-600',
+    },
+  ];
+
   return (
     <div className='space-y-6'>
       {/* Header */}
@@ -97,58 +128,23 @@ export default function AdminQuizDetailPage() {
 
       {/* Statistics */}
       <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <HelpCircle className='w-5 h-5 text-blue-600' />
+        {quizStats.map((stat) => (
+          <Card key={stat.label}>
+            <CardContent className='p-4'>
+              <div className='flex items-center space-x-3'>
+                <div
+                  className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center`}
+                >
+                  <div className={stat.iconColor}>{stat.icon}</div>
+                </div>
+                <div>
+                  <p className='text-2xl font-bold text-gray-900'>{stat.value}</p>
+                  <p className='text-sm text-gray-600'>{stat.label}</p>
+                </div>
               </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{quiz.questions?.length || 0}</p>
-                <p className='text-sm text-gray-600'>Questions</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <Users className='w-5 h-5 text-purple-600' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{attempts.length}</p>
-                <p className='text-sm text-gray-600'>Attempts</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center'>
-                <TrendingUp className='w-5 h-5 text-green-600' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{avgScore}%</p>
-                <p className='text-sm text-gray-600'>Avg Score</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <Award className='w-5 h-5 text-orange-600' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{passRate}%</p>
-                <p className='text-sm text-gray-600'>Pass Rate</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Questions */}

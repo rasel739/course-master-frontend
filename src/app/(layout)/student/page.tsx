@@ -49,7 +49,7 @@ const Dashboard = () => {
       value:
         enrollments?.length > 0
           ? Math.round(enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length) +
-          '%'
+            '%'
           : '0%',
       icon: Clock,
       color: 'bg-orange-100 text-orange-600',
@@ -92,7 +92,7 @@ const Dashboard = () => {
         <div>
           <div className='flex items-center justify-between mb-4'>
             <h2 className='text-2xl font-bold text-gray-900'>Continue Learning</h2>
-            <Link href='/enrollment'>
+            <Link href={`/${user?.role}/enrollment`}>
               <Button variant='ghost' size='sm'>
                 View All
                 <ChevronRight className='w-4 h-4 ml-1' />
@@ -107,7 +107,7 @@ const Dashboard = () => {
                 <Card
                   key={enrollment._id}
                   className='hover:shadow-lg transition-shadow cursor-pointer'
-                  onClick={() => router.push(`/enrollment/${enrollment._id}`)}
+                  onClick={() => router.push(`/${user?.role}/enrollment/${enrollment._id}`)}
                 >
                   <div className='relative h-48 bg-linear-to-br from-blue-500 to-purple-600 rounded-t-lg'>
                     <Image src={`${course?.thumbnail}`} alt='course-image' fill />
@@ -158,7 +158,7 @@ const Dashboard = () => {
             <p className='text-gray-600 mb-6'>
               Start your learning journey by enrolling in a course
             </p>
-            <Link href='/courses'>
+            <Link href='/course'>
               <Button>
                 Browse Courses
                 <ChevronRight className='w-4 h-4 ml-1' />
@@ -172,7 +172,7 @@ const Dashboard = () => {
       <div>
         <h2 className='text-2xl font-bold text-gray-900 mb-4'>Quick Actions</h2>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <Link href='/courses'>
+          <Link href='/course'>
             <Card className='hover:shadow-md transition-shadow cursor-pointer'>
               <CardContent className='p-6 flex items-center space-x-4'>
                 <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
@@ -186,7 +186,7 @@ const Dashboard = () => {
             </Card>
           </Link>
 
-          <Link href='/enrollment'>
+          <Link href={`/${user?.role}/enrollment`}>
             <Card className='hover:shadow-md transition-shadow cursor-pointer'>
               <CardContent className='p-6 flex items-center space-x-4'>
                 <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>

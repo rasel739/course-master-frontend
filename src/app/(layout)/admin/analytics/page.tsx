@@ -1,14 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen, Users, GraduationCap, TrendingUp, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchAnalytics } from '@/redux/features/adminSlice';
 import Loading from '@/app/loading';
+import { exportData } from '@/utils';
+import { ADMIN_ANALYTICS_STATS } from '@/constants';
+import StatsCard from '@/components/admin/stats_card';
+import { IAnalyticsData } from '@/types';
 
-export default function AdminAnalyticsPage() {
+const AdminAnalyticsPage = () => {
   const dispatch = useAppDispatch();
   const { analytics, isLoading } = useAppSelector((state) => state.admin);
   const [dateRange, setDateRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
@@ -26,19 +30,6 @@ export default function AdminAnalyticsPage() {
 
     dispatch(fetchAnalytics({ startDate, endDate }));
   }, [dispatch, dateRange]);
-
-  const exportData = () => {
-    if (!analytics) return;
-
-    const data = JSON.stringify(analytics, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `analytics-${new Date().toISOString()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   if (isLoading) {
     return <Loading />;
@@ -63,7 +54,7 @@ export default function AdminAnalyticsPage() {
             <option value='90d'>Last 90 days</option>
             <option value='all'>All time</option>
           </select>
-          <Button variant='outline' size='sm' onClick={exportData}>
+          <Button variant='outline' size='sm' onClick={() => exportData(analytics)}>
             <Download className='w-4 h-4 mr-2' />
             Export
           </Button>
@@ -71,65 +62,12 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Overview Stats */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <BookOpen className='w-6 h-6 text-blue-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>
-              {analytics?.overview.totalCourses || 0}
-            </h3>
-            <p className='text-sm text-gray-600'>Total Courses</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <Users className='w-6 h-6 text-purple-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>
-              {analytics?.overview.totalStudents || 0}
-            </h3>
-            <p className='text-sm text-gray-600'>Total Students</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <GraduationCap className='w-6 h-6 text-green-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>
-              {analytics?.overview.totalEnrollments || 0}
-            </h3>
-            <p className='text-sm text-gray-600'>Total Enrollments</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <div className='w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center'>
-                <TrendingUp className='w-6 h-6 text-orange-600' />
-              </div>
-            </div>
-            <h3 className='text-3xl font-bold text-gray-900 mb-1'>
-              {analytics?.overview.totalCourses
-                ? Math.round(analytics.overview.totalEnrollments / analytics.overview.totalCourses)
-                : 0}
-            </h3>
-            <p className='text-sm text-gray-600'>Avg Enrollments/Course</p>
-          </CardContent>
-        </Card>
-      </div>
+      {analytics && (
+        <StatsCard
+          analytics={analytics}
+          ANALYTICS_STATS={(data) => ADMIN_ANALYTICS_STATS(data as IAnalyticsData)}
+        />
+      )}
 
       {/* Enrollment Trends */}
       <Card>
@@ -186,7 +124,7 @@ export default function AdminAnalyticsPage() {
                     <div>
                       <h4 className='font-semibold text-gray-900'>{category._id}</h4>
                       <p className='text-sm text-gray-600'>
-                        {category.count} courses • {category.totalEnrollments} enrollments
+                        {category.count} courses • {category?.totalEnrollments} enrollments
                       </p>
                     </div>
                     <div className='text-right'>
@@ -198,7 +136,7 @@ export default function AdminAnalyticsPage() {
                   </div>
                   <div className='grid grid-cols-3 gap-4 text-center'>
                     <div className='bg-blue-50 rounded-lg p-3'>
-                      <p className='text-2xl font-bold text-blue-600'>{category.count}</p>
+                      <p className='text-2xl font-bold text-blue-600'>{category?.count}</p>
                       <p className='text-xs text-gray-600'>Courses</p>
                     </div>
                     <div className='bg-purple-50 rounded-lg p-3'>
@@ -297,4 +235,6 @@ export default function AdminAnalyticsPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminAnalyticsPage;
