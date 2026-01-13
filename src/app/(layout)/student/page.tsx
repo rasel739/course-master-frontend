@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BookOpen, TrendingUp, Award, Clock, Play, ChevronRight } from 'lucide-react';
+import { BookOpen, TrendingUp, Award, Play, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchDashboard } from '@/redux/features/enrollmentSlice';
 import Loading from '@/app/loading';
 import Image from 'next/image';
+import { STUDENT_ANALYTICS_STATS } from '@/constants/student';
 
 const Dashboard = () => {
   const router = useRouter();
@@ -25,36 +26,15 @@ const Dashboard = () => {
     }
   }, [dispatch, user, isAuthenticated]);
 
-  const stats = [
-    {
-      title: 'Enrolled Courses',
-      value: enrollments?.length,
-      icon: BookOpen,
-      color: 'bg-blue-100 text-blue-600',
-    },
-    {
-      title: 'In Progress',
-      value: enrollments?.filter((e) => e.progress > 0 && e.progress < 100).length,
-      icon: TrendingUp,
-      color: 'bg-purple-100 text-purple-600',
-    },
-    {
-      title: 'Completed',
-      value: enrollments?.filter((e) => e.progress === 100).length,
-      icon: Award,
-      color: 'bg-green-100 text-green-600',
-    },
-    {
-      title: 'Total Progress',
-      value:
-        enrollments?.length > 0
-          ? Math.round(enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length) +
-            '%'
-          : '0%',
-      icon: Clock,
-      color: 'bg-orange-100 text-orange-600',
-    },
-  ];
+  const enrolledCount = enrollments?.length ?? 0;
+  const inProgressCount =
+    enrollments?.filter((e) => e.progress > 0 && e.progress < 100).length ?? 0;
+  const completedCount = enrollments?.filter((e) => e.progress === 100).length ?? 0;
+
+  const averageProgress =
+    enrolledCount > 0
+      ? Math.round(enrollments!.reduce((sum, e) => sum + e.progress, 0) / enrolledCount)
+      : 0;
 
   if (isLoading) {
     return <Loading />;
@@ -70,18 +50,23 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-        {stats?.map((stat, index) => (
+        {STUDENT_ANALYTICS_STATS({
+          enrollmentCount: enrolledCount,
+          enrollmentProgress: inProgressCount,
+          enrollmentCompleted: completedCount,
+          enrollmentTotalProgress: averageProgress,
+        })?.map((stat, index) => (
           <Card key={index}>
             <CardContent className='p-6'>
               <div className='flex items-center justify-between mb-4'>
                 <div
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.iconColor}`}
                 >
                   <stat.icon className='w-6 h-6' />
                 </div>
               </div>
               <h3 className='text-2xl font-bold text-gray-900 mb-1'>{stat.value}</h3>
-              <p className='text-sm text-gray-600'>{stat.title}</p>
+              <p className='text-sm text-gray-600'>{stat.label}</p>
             </CardContent>
           </Card>
         ))}

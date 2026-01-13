@@ -137,7 +137,6 @@ const CourseDetails = () => {
               </div>
             </div>
 
-            {/* Right - Preview Card (Desktop hidden, we show sticky card below) */}
             <div className='hidden lg:block' />
           </div>
         </div>

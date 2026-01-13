@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchDashboard } from '@/redux/features/enrollmentSlice';
 import { formatDate } from '@/utils';
 import Loading from '@/app/loading';
+import Image from 'next/image';
 
 const Enrollment = () => {
   const router = useRouter();
@@ -111,6 +112,12 @@ const Enrollment = () => {
                 <CardContent className='p-6'>
                   <div className='flex flex-col md:flex-row md:items-center gap-6'>
                     <div className='w-full md:w-48 h-32 bg-linear-to-br from-blue-500 to-purple-600 rounded-lg shrink-0 relative overflow-hidden'>
+                      <Image
+                        src={course.thumbnail || '/default-course.jpg'}
+                        alt={course.title}
+                        fill
+                        className='object-cover'
+                      />
                       <div className='absolute inset-0 bg-black/20' />
                       <div className='absolute bottom-3 left-3'>
                         <span className='bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium'>
