@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { CheckCircle, BookOpen, ArrowRight, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { CHECKOUT_STEPS } from '@/constants/student';
 
 const CheckoutSuccessPage = () => {
   const date = new Date();
@@ -40,39 +41,17 @@ const CheckoutSuccessPage = () => {
         <CardContent className='p-6'>
           <h2 className='text-lg font-bold text-gray-900 mb-4'>What&apos;s Next?</h2>
           <div className='space-y-4 text-left'>
-            <div className='flex items-start gap-3'>
-              <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0'>
-                <span className='text-blue-600 font-bold text-sm'>1</span>
+            {CHECKOUT_STEPS.map((step, index) => (
+              <div key={index} className='flex items-start gap-3'>
+                <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0'>
+                  <span className='text-blue-600 font-bold text-sm'>{index + 1}</span>
+                </div>
+                <div>
+                  <p className='font-medium text-gray-900'>{step.title}</p>
+                  <p className='text-sm text-gray-600'>{step.description}</p>
+                </div>
               </div>
-              <div>
-                <p className='font-medium text-gray-900'>Access Your Courses</p>
-                <p className='text-sm text-gray-600'>
-                  Head to your dashboard to start learning immediately.
-                </p>
-              </div>
-            </div>
-            <div className='flex items-start gap-3'>
-              <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0'>
-                <span className='text-blue-600 font-bold text-sm'>2</span>
-              </div>
-              <div>
-                <p className='font-medium text-gray-900'>Download Resources</p>
-                <p className='text-sm text-gray-600'>
-                  Download supplementary materials for offline learning.
-                </p>
-              </div>
-            </div>
-            <div className='flex items-start gap-3'>
-              <div className='w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0'>
-                <span className='text-blue-600 font-bold text-sm'>3</span>
-              </div>
-              <div>
-                <p className='font-medium text-gray-900'>Earn Your Certificate</p>
-                <p className='text-sm text-gray-600'>
-                  Complete the course to receive your verified certificate.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>

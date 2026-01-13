@@ -9,7 +9,6 @@ import {
   Maximize,
   Minimize,
   SkipForward,
-  SkipBack,
   RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -49,7 +48,6 @@ const YouTubePlayer = ({
   videoId,
   title,
   autoPlay,
-  onComplete,
   className,
 }: {
   videoId: string;

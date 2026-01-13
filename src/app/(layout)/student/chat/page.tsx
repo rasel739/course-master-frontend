@@ -19,7 +19,7 @@ import ChatWindow from '@/components/chat/ChatWindow';
 import NewConversationModal from '@/components/chat/NewConversationModal';
 import { ArrowLeft } from 'lucide-react';
 
-export default function ChatPage() {
+const ChatPage = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const {
@@ -120,7 +120,7 @@ export default function ChatPage() {
   const handleSelectConversation = useCallback(
     (conversation: ChatConversation) => {
       dispatch(setActiveConversation(conversation));
-      setShowMobileChat(true); // Show chat window on mobile when conversation selected
+      setShowMobileChat(true);
     },
     [dispatch]
   );
@@ -136,7 +136,7 @@ export default function ChatPage() {
   const handleStartConversation = (participantId: string, initialMessage?: string) => {
     dispatch(createConversation({ participantId, initialMessage }));
     setIsModalOpen(false);
-    setShowMobileChat(true); // Show chat window after creating conversation
+    setShowMobileChat(true);
   };
 
   const handleSendMessage = useCallback(
@@ -149,7 +149,7 @@ export default function ChatPage() {
       const message = await socketSendMessage(activeConversation._id, content);
 
       if (message) {
-        dispatch(fetchConversations()); // Refresh to update last message
+        dispatch(fetchConversations());
       }
 
       setLocalIsSending(false);
@@ -178,7 +178,6 @@ export default function ChatPage() {
   return (
     <div className='h-[calc(100vh-64px)] sm:h-[calc(100vh-80px)] overflow-hidden -m-3 sm:-m-4 lg:-m-6'>
       <div className='flex h-full'>
-        {/* Sidebar - Hidden on mobile when viewing chat */}
         <div
           className={`${showMobileChat ? 'hidden' : 'w-full'} md:block md:w-72 lg:w-80 shrink-0`}
         >
@@ -220,7 +219,6 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* New Conversation Modal */}
       <NewConversationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -230,4 +228,6 @@ export default function ChatPage() {
       />
     </div>
   );
-}
+};
+
+export default ChatPage;

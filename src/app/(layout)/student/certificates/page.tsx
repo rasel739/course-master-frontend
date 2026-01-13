@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { Award, Download, Eye, Calendar, BookOpen, Search, Loader2 } from 'lucide-react';
+import { Award, Download, Eye, Search, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { certificateApi } from '@/helpers/axios/api';
 import Loading from '@/app/loading';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { CERTIFICATE_STATS } from '@/constants/student';
 
 interface Certificate {
   _id: string;
@@ -21,7 +22,7 @@ interface Certificate {
   studentNameAtIssue: string;
 }
 
-export default function CertificatesPage() {
+const CertificatesPage = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -139,47 +140,31 @@ export default function CertificatesPage() {
 
       {/* Stats */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center space-x-4'>
-              <div className='w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center'>
-                <Award className='w-6 h-6 text-blue-600' />
+        {CERTIFICATE_STATS({
+          certificateCount: certificates.length,
+          latestCertificateDate:
+            certificates.length > 0 ? formatDate(certificates[0].issuedAt) : 'N/A',
+        })?.map((stat, index) => (
+          <Card key={index}>
+            <CardContent className='p-6 flex items-center space-x-4'>
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.iconBgColor} ${stat.iconColor}`}
+              >
+                <stat.icon className='w-6 h-6' />
               </div>
               <div>
-                <p className='text-2xl font-bold text-gray-900'>{certificates.length}</p>
-                <p className='text-sm text-gray-600'>Total Certificates</p>
+                <h3
+                  className={`${
+                    stat.label === 'Latest Certificate' ? '' : 'text-2xl'
+                  } font-bold text-gray-900 mb-1`}
+                >
+                  {stat.value}
+                </h3>
+                <p className='text-sm text-gray-600'>{stat.label}</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center space-x-4'>
-              <div className='w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center'>
-                <BookOpen className='w-6 h-6 text-green-600' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-gray-900'>{certificates.length}</p>
-                <p className='text-sm text-gray-600'>Courses Completed</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className='p-6'>
-            <div className='flex items-center space-x-4'>
-              <div className='w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center'>
-                <Calendar className='w-6 h-6 text-purple-600' />
-              </div>
-              <div>
-                <p className='text-sm font-medium text-gray-900'>
-                  {certificates.length > 0 ? formatDate(certificates[0].issuedAt) : 'N/A'}
-                </p>
-                <p className='text-sm text-gray-600'>Latest Certificate</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Search */}
@@ -368,4 +353,6 @@ export default function CertificatesPage() {
       )}
     </div>
   );
-}
+};
+
+export default CertificatesPage;

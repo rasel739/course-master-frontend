@@ -1,5 +1,6 @@
 'use client';
-import { useEffect } from 'react';
+
+import { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
@@ -8,6 +9,7 @@ import { fetchUnreadCount } from '@/redux/features/chatSlice';
 import { toggleSidebar } from '@/redux/features/uiSlice';
 import { Icons } from '@/lib/icons';
 import Sidebar from '@/components/layout/sidebar';
+import Loading from '../loading';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -15,48 +17,95 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { sidebarOpen } = useAppSelector((state) => state.ui);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const hasInitializedAuth = useRef(false);
+
+  const handleToggleSidebar = useCallback(() => {
+    dispatch(toggleSidebar());
+  }, [dispatch]);
+
   useEffect(() => {
+    if (hasInitializedAuth.current) return;
+
     const token = Cookies.get('accessToken');
-    if (!user && !token) {
+
+    if (!token && !user) {
       router.replace('/login');
       return;
     }
 
-    if (!user) {
-      dispatch(fetchCurrentUser()).finally(() => {
-        if (!isAuthenticated) {
-          router.replace('/login');
-        }
-      });
+    if (token && !user && !isLoading) {
+      hasInitializedAuth.current = true;
+
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      abortControllerRef.current = new AbortController();
+
+      dispatch(fetchCurrentUser())
+        .unwrap()
+        .catch((error) => {
+          if (error.name !== 'AbortError') {
+            Cookies.remove('accessToken');
+            router.replace('/login');
+          }
+        });
     }
-  }, [dispatch, router, user, isAuthenticated]);
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [user, isLoading, router, dispatch]);
 
   useEffect(() => {
-    if (isAuthenticated && user && !isLoading) {
-      dispatch(fetchUnreadCount());
+    if (!isAuthenticated || !user) {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+      return;
     }
-  }, [dispatch, isAuthenticated, user, isLoading]);
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) return;
-    const interval = setInterval(() => {
+    dispatch(fetchUnreadCount());
+
+    pollIntervalRef.current = setInterval(() => {
       dispatch(fetchUnreadCount());
     }, 30000);
-    return () => clearInterval(interval);
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
   }, [dispatch, isAuthenticated, user]);
+
+  if (isLoading && !user) {
+    return <Loading />;
+  }
+
+  if (!isAuthenticated || !user) {
+    return null;
+  }
 
   return (
     <div className='min-h-screen bg-gray-50'>
       {/* Sidebar */}
       <Sidebar />
+
       {/* Main Content */}
       <div className='lg:pl-64'>
         {/* Mobile Header */}
-        <header className={`lg:hidden sticky top-0 z-40 bg-white border-b border-gray-200`}>
+        <header className='lg:hidden sticky top-0 z-40 bg-white border-b border-gray-200'>
           <div className='flex items-center justify-between h-16 px-4'>
             <button
-              onClick={() => dispatch(toggleSidebar())}
-              className='p-2 rounded-lg hover:bg-gray-100'
+              onClick={handleToggleSidebar}
+              className='p-2 rounded-lg hover:bg-gray-100 transition-colors'
+              aria-label='Toggle sidebar'
             >
               <Icons.Menu className='w-6 h-6' />
             </button>
@@ -77,8 +126,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className='fixed inset-0 bg-black/50 z-40 lg:hidden'
-          onClick={() => dispatch(toggleSidebar())}
+          className='fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity'
+          onClick={handleToggleSidebar}
+          aria-hidden='true'
         />
       )}
     </div>
