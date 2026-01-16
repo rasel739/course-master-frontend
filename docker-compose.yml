@@ -1,35 +1,43 @@
+version: '3.9'
+
 services:
+  # Production container
   app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5000}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      test: ['CMD', 'wget', '--spider', 'http://localhost:3000']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  # Development mode with hot reload
+  # Development container with hot reload
   dev:
     build:
       context: .
       dockerfile: Dockerfile
-      target: deps
+      target: deps # only install dependencies
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
-      - .:/app
-      - /app/node_modules
+      # Only mount source folders to avoid large volume sync delays
+      - ./pages:/app/pages
+      - ./components:/app/components
+      - ./public:/app/public
+      - ./styles:/app/styles
+      - /app/node_modules # keep node_modules inside container
     environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      COMPOSE_HTTP_TIMEOUT: 300
     command: yarn dev
     profiles:
       - dev
