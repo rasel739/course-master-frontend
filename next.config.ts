@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  compiler: {
+    removeConsole: true,
+  },
   output: 'standalone',
   images: {
     remotePatterns: [

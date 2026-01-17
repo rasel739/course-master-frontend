@@ -9,16 +9,26 @@ import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { SidebarItems } from '@/constants/sidebarItems';
 import { USER_ROLE } from '@/constants/role';
+import { useMemo } from 'react';
+import Loading from '@/app/loading';
 
 const Sidebar = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const { sidebarOpen } = useAppSelector((state) => state.ui);
   const { user } = useAppSelector((state) => state.auth);
-  const router = useRouter();
-
-  const dispatch = useAppDispatch();
 
   const adminRole = user?.role === USER_ROLE.ADMIN;
 
+  const sidebarItems = useMemo(() => SidebarItems(user?.role || ''), [user?.role]);
+
+  if (!user) {
+    return <Loading />;
+  }
+
+  if (!user) {
+    return null;
+  }
   const handleLogout = async () => {
     try {
       await dispatch(logoutUser()).unwrap();
@@ -69,7 +79,7 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className='flex-1 px-4 py-6 space-y-2 overflow-y-auto'>
-          {SidebarItems(user?.role || '').map((item) => (
+          {sidebarItems.map((item) => (
             <Link
               key={item.name}
               href={item.path}

@@ -2,14 +2,12 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { fetchCurrentUser } from '@/redux/features/authSlice';
 import { fetchUnreadCount } from '@/redux/features/chatSlice';
 import { toggleSidebar } from '@/redux/features/uiSlice';
 import { Icons } from '@/lib/icons';
 import Sidebar from '@/components/layout/sidebar';
-import Loading from '../loading';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -28,14 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (hasInitializedAuth.current) return;
 
-    const token = Cookies.get('accessToken');
-
-    if (!token && !user) {
-      router.replace('/login');
-      return;
-    }
-
-    if (token && !user && !isLoading) {
+    if (!user && !isLoading) {
       hasInitializedAuth.current = true;
 
       if (abortControllerRef.current) {
@@ -48,7 +39,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .unwrap()
         .catch((error) => {
           if (error.name !== 'AbortError') {
-            Cookies.remove('accessToken');
             router.replace('/login');
           }
         });
@@ -83,14 +73,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
     };
   }, [dispatch, isAuthenticated, user]);
-
-  if (isLoading && !user) {
-    return <Loading />;
-  }
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
 
   return (
     <div className='min-h-screen bg-gray-50'>

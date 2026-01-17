@@ -7,7 +7,7 @@ export function proxy(request: NextRequest) {
 
   const publicRoutes = ['/', '/login', '/register'];
 
-  const alwaysAccessibleRoutes = ['/courses'];
+  const alwaysAccessibleRoutes = ['/course', '/about', '/contact'];
 
   //   const adminRoutes = ['/admin'];
 
