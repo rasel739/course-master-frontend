@@ -11,8 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Rating } from '@/components/ui/rating';
 import { courseApi } from '@/helpers/axios/api';
 import { Course } from '@/types';
+import { useAppSelector } from '@/redux/hook';
 
 export const FeaturedCourses = () => {
+  const { user } = useAppSelector((state) => state.auth);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -95,7 +97,7 @@ export const FeaturedCourses = () => {
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8'>
           <div>
             <h2 className='text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2'>
-              Featured Courses
+              All Courses
             </h2>
             <p className='text-gray-600 text-sm sm:text-base'>
               Learn from the best instructors worldwide
@@ -133,9 +135,13 @@ export const FeaturedCourses = () => {
         >
           {courses.map((course) => (
             <Link
-              href={`/course/${course._id}`}
+              href={`${
+                user?.role === 'student'
+                  ? `/${user?.role}/course/${course._id}`
+                  : `/course/${course._id}`
+              }`}
               key={course._id}
-              className='shrink-0 w-[260px] sm:w-[280px] md:w-[320px] group snap-start'
+              className='shrink-0 w-[260px] sm:w-[280px] md:w-[320px] group snap-start '
             >
               <Card className='overflow-hidden hover-lift border-0 shadow-md hover:shadow-xl transition-all duration-300'>
                 <div className='relative h-[140px] sm:h-40 md:h-[180px] bg-gray-200'>
@@ -203,6 +209,15 @@ export const FeaturedCourses = () => {
                   </div>
                 </CardContent>
               </Card>
+              <div className='flex justify-center align-middle'>
+                <Button
+                  variant='outline'
+                  style={{ textDecoration: 'none' }}
+                  className='mt-2 text-blue-600 hover:underline text-sm sm:text-base cursor-pointer '
+                >
+                  View Details
+                </Button>
+              </div>
             </Link>
           ))}
         </div>

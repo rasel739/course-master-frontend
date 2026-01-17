@@ -9,6 +9,7 @@ import { Rating } from '@/components/ui/rating';
 import { cn } from '@/utils';
 import { Course } from '@/types';
 import { formatDuration, formatPrice } from '@/utils';
+import { useAppSelector } from '@/redux/hook';
 
 interface CourseCardProps {
   course: Course;
@@ -25,6 +26,7 @@ export const CourseCard = ({
   progress = 0,
   className,
 }: CourseCardProps) => {
+  const { user } = useAppSelector((state) => state.auth);
   const totalLessons =
     course.totalLessons || course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
   const totalDuration =
@@ -37,7 +39,7 @@ export const CourseCard = ({
 
   if (variant === 'horizontal') {
     return (
-      <Link href={`/course/${course._id}`} className={cn('block group', className)}>
+      <Link href={`/${user?.role}/course/${course._id}`} className={cn('block group', className)}>
         <Card className='overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1'>
           <div className='flex flex-col md:flex-row'>
             <div className='relative w-full md:w-64 h-48 md:h-auto shrink-0 bg-gray-200'>
@@ -96,7 +98,7 @@ export const CourseCard = ({
 
   if (variant === 'compact') {
     return (
-      <Link href={`/course/${course._id}`} className={cn('block group', className)}>
+      <Link href={`/${user?.role}/course/${course._id}`} className={cn('block group', className)}>
         <div className='flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors'>
           <div className='relative w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-gray-200'>
             {course.thumbnail ? (
@@ -121,7 +123,7 @@ export const CourseCard = ({
 
   // Default variant
   return (
-    <Link href={`/course/${course._id}`} className={cn('block group', className)}>
+    <Link href={`/${user?.role}/course/${course._id}`} className={cn('block group', className)}>
       <Card className='overflow-hidden hover-lift border-0 shadow-md hover:shadow-xl transition-all duration-300'>
         <div className='relative h-[180px] bg-gray-200'>
           {course.thumbnail ? (
